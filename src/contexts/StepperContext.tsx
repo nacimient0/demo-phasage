@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
 import { defineStepper } from "@stepperize/react"
 import { phases, totalPoints } from "@/data/phases"
-import { useNavigationMode } from "./NavigationModeContext"
 import type { Phase } from "@/types/phase"
 
 // Définir les steps pour stepperize
@@ -50,7 +49,6 @@ export function StepperProvider({ children }: { children: ReactNode }) {
     const [isPlaying, setIsPlaying] = useState(false)
     const [hoveredPointId, setHoveredPointId] = useState<number | null>(null)
     const stepper = useStepperize()
-    const { mode } = useNavigationMode()
     const currentPointId = stepper.state.current.data.pointId
 
     // Trouver la phase courante
@@ -61,52 +59,25 @@ export function StepperProvider({ children }: { children: ReactNode }) {
     // Trouver la phase survolée
     const hoveredPhase = hoveredPointId
         ? phases.find((phase) => hoveredPointId >= phase.startPoint && hoveredPointId <= phase.endPoint)
-        : undefined    // Navigation vers un point spécifique
+        : undefined
+
+    // Navigation vers un point spécifique
     const goToPoint = useCallback((pointId: number) => {
         stepper.navigation.goTo(`step-${pointId}`)
-    }, [stepper.navigation])    // Auto-play adapté au mode
+    }, [stepper.navigation])    // Auto-play : boucle infinie point par point
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>
         if (isPlaying) {
-            // Définir l'intervalle en fonction du mode
-            const getInterval = () => {
-                if (mode === "planning") return 800 // Plus rapide pour planning (0.8 secondes)
-                if (mode === "phasage") return 2000 // 2 secondes pour phasage
-                return 2000 // 2 secondes pour installation
-            }
-
             interval = setInterval(() => {
-                if (mode === "phasage") {
-                    // Passer à la phase suivante
-                    const currentPhaseIndex = phases.findIndex(p => 
-                        currentPointId >= p.startPoint && currentPointId <= p.endPoint
-                    )
-                    if (currentPhaseIndex < phases.length - 1) {
-                        goToPoint(phases[currentPhaseIndex + 1].startPoint)
-                    } else {
-                        setIsPlaying(false)
-                    }
-                } else if (mode === "installation") {
-                    // Passer à l'image suivante
-                    if (currentPointId <= 7) {
-                        goToPoint(8)
-                    } else if (currentPointId <= 15) {
-                        goToPoint(16)
-                    } else {
-                        setIsPlaying(false)
-                    }
+                if (!stepper.state.isLast) {
+                    stepper.navigation.next()
                 } else {
-                    // Mode planning : navigation normale
-                    if (!stepper.state.isLast) {
-                        stepper.navigation.next()
-                    } else {
-                        setIsPlaying(false)
-                    }
+                    stepper.navigation.goTo("step-1")
                 }
-            }, getInterval())
+            }, 800)
         }
         return () => clearInterval(interval)
-    }, [isPlaying, currentPointId, mode, stepper.state.isLast, stepper.navigation, goToPoint])
+    }, [isPlaying, stepper.state.isLast, stepper.navigation])
 
     return (
         <StepperContext.Provider

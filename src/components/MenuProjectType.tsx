@@ -1,7 +1,21 @@
-import { useState } from "react"
-import { ChevronDown, ChevronUp, CalendarClock, TrafficCone, Construction } from "lucide-react"
-import { useNavigationMode } from "@/contexts/NavigationModeContext"
+import { useState, useEffect, useRef } from "react"
+import { ChevronDown, ChevronUp, CalendarClock, TrafficCone } from "lucide-react"
+import { useNavigationMode, type NavigationMode } from "@/contexts/NavigationModeContext"
 import { useStepper } from "@/contexts/StepperContext"
+import { useInstallationNav } from "@/hooks/useNavigationNav"
+import { Crane } from "./custom-svg/Crane"
+
+const LABEL_TO_MODE: Record<string, NavigationMode> = {
+    "Planning chantier": "planning",
+    "Phasage chantier": "phasage",
+    "Installation chantier": "installation",
+}
+
+const MODE_TO_LABEL: Record<NavigationMode, string> = {
+    planning: "Planning chantier",
+    phasage: "Phasage chantier",
+    installation: "Installation chantier",
+}
 
 interface ProjectTypeButtonProps {
     label: string
@@ -12,7 +26,7 @@ interface ProjectTypeButtonProps {
 
 const ICONS = {
     "Planning chantier": CalendarClock,
-    "Phasage chantier": Construction,
+    "Phasage chantier": Crane,
     "Installation chantier": TrafficCone
 }
 
@@ -22,19 +36,19 @@ function ProjectTypeButton({ label, onClick, isSelected, isExpanded }: ProjectTy
     return (
         <button
             onClick={onClick}
-            className={`inline-flex text-black items-center justify-start gap-3 border border-black px-4 py-3 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer -mt-[1px] first:mt-0  ${
-                isSelected
-                    ? "bg-white z-10"
-                    : "bg-background hover:bg-[#E30613] hover:text-white hover:z-10"
-            }`}
+            className={`inline-flex items-center md:h-10 sm:h-8 justify-start text-black md:gap-3 sm:gap-2 border border-black md:px-4 sm:px-2 md:text-sm sm:text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer -mt-[1px] first:mt-0
+                ${isSelected
+                    ? "bg-white z-10 md:border-r-0"
+                    : "bg-white hover:bg-[#E30613] hover:text-white hover:z-10 md:mr-[-1px]"
+                }`}
         >
-            <Icon className="w-6 h-6 shrink-0" />
+            <Icon className="md:w-6 md:h-6 shrink-0 sm:w-5 sm:h-5" />
             <span className="flex-1 text-left">{label}</span>
             {isSelected && (
                 isExpanded ? (
-                    <ChevronUp className="w-4 h-4 shrink-0" />
+                    <ChevronUp className="md:w-4 md:h-4 shrink-0 sm:w-3 sm:h-3" />
                 ) : (
-                    <ChevronDown className="w-4 h-4 shrink-0" />
+                    <ChevronDown className="md:w-4 md:h-4 shrink-0 sm:w-3 sm:h-3" />
                 )
             )}
         </button>
@@ -48,38 +62,50 @@ const PROJECT_TYPES = [
 ]
 
 export function MenuProjectType() {
-    const [selectedType, setSelectedType] = useState(PROJECT_TYPES[0]) // Planning par défaut
+    const { mode, setMode } = useNavigationMode()
     const [isExpanded, setIsExpanded] = useState(false)
-    const { setMode } = useNavigationMode()
-    const { goToPoint, setIsPlaying } = useStepper()
+    const { goToPoint, setIsPlaying, currentPointId } = useStepper()
+    const { installationIndex } = useInstallationNav()
+    const containerRef = useRef<HTMLDivElement>(null)
 
-    const handleTypeClick = (type: string) => {
-        if (type === selectedType) {
-            // Toggle expand/collapse si on clique sur le type sélectionné
-            setIsExpanded(!isExpanded)
+    const selectedLabel = MODE_TO_LABEL[mode]
+
+    // Fermer le menu quand le mode, le point de vue ou le point planning change
+    useEffect(() => {
+        setIsExpanded(false)
+    }, [mode, installationIndex, currentPointId])
+
+    // Fermer le menu au clic extérieur
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsExpanded(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
+
+    const handleTypeClick = (label: string) => {
+        const newMode = LABEL_TO_MODE[label]
+        if (newMode === mode) {
+            setIsExpanded(prev => !prev)
         } else {
-            // Sélectionner un nouveau type et fermer le menu
-            setSelectedType(type)
-            setIsExpanded(false)
-            
-            // Arrêter la lecture automatique
             setIsPlaying(false)
-            
-            // Réinitialiser la progression au début (point 1)
             goToPoint(1)
-            
-            // Mettre à jour le mode de navigation
-            if (type === "Planning chantier") setMode("planning")
-            else if (type === "Phasage chantier") setMode("phasage")
-            else if (type === "Installation chantier") setMode("installation")
+            setMode(newMode)
+            setIsExpanded(false)
         }
     }
 
     return (
-        <div className="flex">
+        <div className="flex" ref={containerRef}>
             <div className="flex relative flex-col w-fit">
-                {PROJECT_TYPES.map((label) => {
-                    const isSelected = label === selectedType
+                {[
+                    selectedLabel,
+                    ...PROJECT_TYPES.filter(t => t !== selectedLabel)
+                ].map((label) => {
+                    const isSelected = label === selectedLabel
                     const shouldShow = isSelected || isExpanded
 
                     if (!shouldShow) return null

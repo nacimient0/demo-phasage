@@ -1,5 +1,37 @@
 import type { Phase } from "@/types/phase"
 
+export interface InstallationView {
+    id: number
+    label: string        // Nom affiché dans MenuViewPoint
+    image: string        // Chemin relatif au dossier public
+    conePosition: {      // Position du cône sur le plan de masse
+        bottom: string
+        left: string
+        rotate: string
+    }
+}
+
+export const installationViews: InstallationView[] = [
+    {
+        id: 1,
+        label: "Vue zone de déchargement - Rue Paul LAFARGE",
+        image: "installation/Installation_1.jpg",
+        conePosition: { bottom: "0%", left: "8%", rotate: "rotate-[300deg]" },
+    },
+    {
+        id: 2,
+        label: "Vue zone de déchargement - Rue Jean JAURÈS",
+        image: "installation/Installation_2.jpg",
+        conePosition: { bottom: "55%", left: "90%", rotate: "rotate-[175deg]" },
+    },
+    {
+        id: 3,
+        label: "Vue base vie et zones de déchargement - Rue Paul LAFARGE",
+        image: "installation/Installation_3.jpg",
+        conePosition: { bottom: "0%", left: "50%", rotate: "rotate-[270deg]" },
+    },
+]
+
 export const phases: Phase[] = [
     {
         id: 1,
@@ -63,7 +95,7 @@ export const phases: Phase[] = [
     },
     {
         id: 5,
-        name: "CES et CEA",
+        name: "CEA et CET",
         shortName: "Finitions",
         color: "hsl(340, 80%, 55%)",
         startPoint: 17,

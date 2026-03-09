@@ -20,12 +20,13 @@ export function DownloadPNG() {
         return 2;
     }, [currentPointId, mode]);    // Déterminer l'image actuelle
     const imageSrc = useMemo(() => {
+        const baseUrl = import.meta.env.BASE_URL;
         if (mode === "planning") {
-            return `/planning/Point_${currentPhase?.id}.jpg`;
+            return `${baseUrl}planning/Point_${currentPhase?.id}.jpg`;
         } else if (mode === "phasage") {
-            return `/phases/Phase_${currentPhase?.id}.jpg`;
+            return `${baseUrl}phases/Phase_${currentPhase?.id}.jpg`;
         } else if (mode === "installation") {
-            return `/installation/Installation_${installationIndex + 1}.jpg`;
+            return `${baseUrl}installation/Installation_${installationIndex + 1}.jpg`;
         }
         return currentPhase?.image;
     }, [mode, currentPhase, installationIndex]);
@@ -76,9 +77,9 @@ export function DownloadPNG() {
         <button
             onClick={downloadImage}
             title="Télécharger une capture d'écran"
-            className="inline-flex h-fit text-black items-center justify-center border border-t-0 border-black px-4 py-3 bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
+            className="inline-flex md:size-10 sm:size-8 text-black items-center justify-center border border-t-0 border-black bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
         >
-            <Download className="w-6 h-6" animateOnHover />
+            <Download className="md:w-6 md:h-6 sm:w-5 sm:h-5" animateOnHover />
         </button>
     );
 }

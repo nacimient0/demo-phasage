@@ -1,37 +1,32 @@
 import { useStepper } from "@/contexts/StepperContext"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
+import { usePhasageNav, useInstallationNav } from "@/hooks/useNavigationNav"
+import { installationViews } from "@/data/phases"
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
 
 export function PhaseBackground() {
-    const { currentPhase, currentPointId } = useStepper()
+    const { currentPhase: planningPhase } = useStepper()
     const { mode } = useNavigationMode()
+    const { currentPhase: phasagePhase } = usePhasageNav()
+    const { installationIndex } = useInstallationNav()
 
-    // Calculer l'index d'installation basé sur currentPointId
-    const installationIndex = useMemo(() => {
-        if (mode !== "installation") return 0
-        // Diviser en 3 parties : points 1-7, 8-15, 16-22
-        if (currentPointId <= 7) return 0
-        if (currentPointId <= 15) return 1
-        return 2
-    }, [currentPointId, mode])
-
-    // Déterminer l'image à afficher
     const imageSrc = useMemo(() => {
+        const baseUrl = import.meta.env.BASE_URL
         if (mode === "planning") {
-            // En mode planning, l'image correspond à la phase actuelle, pas au point
-            return `/planning/Point_${currentPhase?.id}.jpg`
+            return `${baseUrl}planning/Point_${planningPhase?.id}.jpg`
         } else if (mode === "phasage") {
-            return `/phases/Phase_${currentPhase?.id}.jpg`
-        } else if (mode === "installation") {
-            return `/installation/Installation_${installationIndex + 1}.jpg`
-        } return currentPhase?.image
-    }, [mode, currentPhase, installationIndex])
+            return `${baseUrl}phases/Phase_${phasagePhase?.id}.jpg`
+        } else {
+            return `${baseUrl}${installationViews[installationIndex].image}`
+        }
+    }, [mode, planningPhase, phasagePhase, installationIndex])
 
-    const altText = useMemo(() => {
-        if (mode === "installation") return `Installation ${installationIndex + 1}`
-        return currentPhase?.name || ""
-    }, [mode, installationIndex, currentPhase])
+    const altText = mode === "installation"
+        ? `Installation ${installationIndex + 1}`
+        : mode === "phasage"
+        ? phasagePhase?.name ?? ""
+        : planningPhase?.name ?? ""
 
     return (
         <div className="h-screen w-screen select-none">

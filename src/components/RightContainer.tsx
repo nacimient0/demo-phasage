@@ -7,7 +7,7 @@ import { TitleProject } from "./TitleProject"
  */
 export function RightContainer() {
     return (
-        <div className="absolute right-2 top-2 z-10 flex flex-col gap-2 items-end">
+        <div className="absolute right-5 top-5 z-10 flex flex-col md:gap-5 sm:gap-2 items-end">
             <TitleProject />
             <MassPlan />
         </div>

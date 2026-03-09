@@ -30,12 +30,12 @@ export function Fullscreen() {
         <button
             onClick={toggleFullscreen}
             title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
-            className="inline-flex text-black items-center justify-center border h-fit border-black px-4 py-3 bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
+            className="inline-flex text-black items-center justify-center border md:size-10 sm:size-8 border-black bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
         >
             {isFullscreen ? (
-                <Minimize className="w-6 h-6" animateOnHover />
+                <Minimize className="md:w-6 md:h-6 sm:w-5 sm:h-5" animateOnHover />
             ) : (
-                <Maximize className="w-6 h-6" animateOnHover />
+                <Maximize className="md:w-6 md:h-6 sm:w-5 sm:h-5" animateOnHover />
             )}
         </button>
     );

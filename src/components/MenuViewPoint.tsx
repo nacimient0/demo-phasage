@@ -1,62 +1,110 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Viewpoint } from "./custom-svg/Viewpoint"
+import { useNavigationMode } from "@/contexts/NavigationModeContext"
+import { useInstallationNav } from "@/hooks/useNavigationNav"
+import { installationViews } from "@/data/phases"
 
 interface ViewpointButtonProps {
     label: string
     onClick?: () => void
     isSelected?: boolean
     isExpanded?: boolean
+    showChevron?: boolean
 }
 
-function ViewpointButton({ label, onClick, isSelected, isExpanded }: ViewpointButtonProps) {
-    const showChevron = VIEWPOINTS.length > 1
+const VIEWPOINTS_DEFAULT = [
+    "Vue rues  ARAGO - Paul LAFARGE"
+]
 
+function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {
     return (
         <button
             onClick={onClick}
-            className={`inline-flex text-black items-center justify-start gap-3 border border-r-0 border-black px-4 py-3 text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] first:mt-0  ${
-                isSelected
-                    ? "bg-white z-10"
-                    : "bg-background hover:bg-[#E30613] hover:text-white hover:z-10"
-            }`}
+            className={`text-black inline-flex items-center md:h-10 sm:h-8 justify-start md:gap-3 sm:gap-2 border border-black md:px-4 sm:px-2 md:text-sm sm:text-xs font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] first:mt-0 ${isSelected
+                ? "bg-white text-black z-10"
+                : "bg-white text-black hover:bg-[#E30613] hover:text-white hover:z-10"
+                }`}
         >
-            <Viewpoint className="w-6 h-6 shrink-0" />
+            <Viewpoint className="md:w-6 md:h-6 shrink-0 sm:w-5 sm:h-5" />
             <span className="flex-1 text-left">{label}</span>
             {isSelected && showChevron && (
-                isExpanded ? (
-                    <ChevronUp className="w-3 h-3 shrink-0" />
-                ) : (
-                    <ChevronDown className="w-3 h-3 shrink-0" />
-                )
+                isExpanded
+                    ? <ChevronUp className="md:w-4 md:h-4 h-4 shrink-0 sm:w-3 sm:h-3" />
+                    : <ChevronDown className="md:w-4 md:h-4 h-4 shrink-0 sm:w-3 sm:h-3" />
             )}
         </button>
     )
 }
 
-const VIEWPOINTS = [
-    "Boulevard de la Résistance",
-]
-
 export function MenuViewPoint() {
-    const [selectedViewpoint, setSelectedViewpoint] = useState(VIEWPOINTS[0])
+    const { mode } = useNavigationMode()
+    const { installationIndex, goTo: goToInstallation } = useInstallationNav()
+
+    const isInstallation = mode === "installation"
+    const installationLabels = installationViews.map(v => v.label)
+    const viewpoints = isInstallation ? installationLabels : VIEWPOINTS_DEFAULT
+
+    const [selectedViewpointDefault, setSelectedViewpointDefault] = useState(VIEWPOINTS_DEFAULT[0])
     const [isExpanded, setIsExpanded] = useState(false)
+    const [trackedMode, setTrackedMode] = useState(mode)
+    const [trackedInstallationIndex, setTrackedInstallationIndex] = useState(installationIndex)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    // Fermer quand le mode ou l'index installation change
+    if (trackedMode !== mode) {
+        setTrackedMode(mode)
+        setIsExpanded(false)
+    }
+    if (trackedInstallationIndex !== installationIndex) {
+        setTrackedInstallationIndex(installationIndex)
+        setIsExpanded(false)
+    }
+
+    // Fermer le menu au clic extérieur
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsExpanded(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
+
+    const selectedViewpoint = isInstallation
+        ? installationViews[installationIndex].label
+        : selectedViewpointDefault
 
     const handleViewpointClick = (viewpoint: string) => {
-        if (viewpoint === selectedViewpoint) {
-            // Toggle expand/collapse si on clique sur le viewpoint sélectionné
-            setIsExpanded(!isExpanded)
+        if (isInstallation) {
+            const isAlreadySelected = viewpoint === installationViews[installationIndex].label
+            if (isAlreadySelected) {
+                setIsExpanded(prev => !prev)
+            } else {
+                const idx = installationViews.findIndex(v => v.label === viewpoint)
+                if (idx !== -1) goToInstallation(idx)
+                setIsExpanded(false)
+            }
         } else {
-            // Sélectionner un nouveau viewpoint et fermer le menu
-            setSelectedViewpoint(viewpoint)
-            setIsExpanded(false)
+            if (viewpoint === selectedViewpointDefault) {
+                setIsExpanded(prev => !prev)
+            } else {
+                setSelectedViewpointDefault(viewpoint)
+                setIsExpanded(false)
+            }
         }
     }
 
+    const showChevron = viewpoints.length > 1
+
     return (
-        <div className="flex">
+        <div className="flex" ref={containerRef}>
             <div className="flex relative flex-col w-fit">
-                {VIEWPOINTS.map((label) => {
+                {[
+                    selectedViewpoint,
+                    ...viewpoints.filter(v => v !== selectedViewpoint)
+                ].map((label) => {
                     const isSelected = label === selectedViewpoint
                     const shouldShow = isSelected || isExpanded
 
@@ -68,6 +116,7 @@ export function MenuViewPoint() {
                             label={label}
                             isSelected={isSelected}
                             isExpanded={isExpanded}
+                            showChevron={showChevron}
                             onClick={() => handleViewpointClick(label)}
                         />
                     )
