@@ -10,7 +10,7 @@ export function PhaseIndicator() {
     if (!currentPhase) return null
     return (
         <div
-            className="absolute -top-10 px-4 py-1.5 rounded-full text-xs font-semibold text-white shadow-lg transition-all duration-300"
+            className="absolute -top-7 md:-top-10 px-2 md:px-4 py-0.5 md:py-1.5 rounded-full text-[10px] md:text-xs font-semibold text-white shadow-lg transition-all duration-300 whitespace-nowrap"
             style={{
                 backgroundColor: currentPhase.color,
                 insetInlineStart: `${((currentPhase.startPoint - 1) / totalPoints) * 100}%`,
@@ -36,12 +36,11 @@ export function TimelinePoints() {
                     const isCompleted = index < phaseIndex
 
                     return (
-                        <div key={phase.id} className="relative flex flex-col items-center group">
-                            {/* Nom de la phase au-dessus */}
+                        <div key={phase.id} className="relative flex flex-col items-center group">                            {/* Nom de la phase au-dessus : toujours visible en desktop, uniquement phase active en mobile */}
                             <div
                                 className={cn(
-                                    "absolute -top-7 md:-top-8 px-2 md:px-3 py-0.5 md:py-1 rounded-full font-semibold text-white shadow-lg whitespace-nowrap",
-                                    isCurrentPhase ? "text-[10px] md:text-sm" : "text-[9px] md:text-xs"
+                                    "absolute -top-5 md:-top-8 px-2 md:px-3 py-0.5 md:py-1 rounded-full font-semibold text-white shadow-lg whitespace-nowrap",
+                                    isCurrentPhase ? "text-[10px] md:text-sm" : "hidden md:block text-[9px] opacity-75 md:text-xs"
                                 )}
                                 style={{ backgroundColor: phase.color }}
                             >
@@ -89,7 +88,7 @@ export function TimelinePoints() {
                         onMouseLeave={() => setHoveredPointId(null)}
                     >
                         {isCurrentPoint && (
-                            <div className="absolute -bottom-4 text-[10px] md:text-xs text-center font-medium word-keep whitespace-nowrap text-black">
+                            <div className="absolute md:-bottom-4 md:text-[9px] sm:text-[6px] sm:-bottom-3 text-center text-white bg-black/50 rounded p-0.5 font-medium word-keep whitespace-nowrap">
                                 {step.label}
                             </div>
                         )}

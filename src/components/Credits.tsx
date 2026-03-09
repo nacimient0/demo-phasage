@@ -6,17 +6,17 @@ export function Credits() {
     return (
         <div
             onClick={handleClick}
-            className="group fixed bottom-0 right-0 flex items-center justify-evenly w-[6vw] h-[35px] rounded-tl-[14px] bg-white text-[11px] font-bold p-[2px] text-black
-        transition-all duration-300 hover:bg-red-600 hover:text-white cursor-pointer max-[992px]:w-fit max-[992px]:pl-[5px] z-[9999]"
+            className="group fixed bottom-0 right-0 flex items-center justify-evenly w-[6vw] sm:h-fit h-[35px] rounded-tl-[14px] bg-white text-[11px] font-bold p-[2px] text-black
+        transition-all duration-300 hover:bg-red-600 hover:text-white cursor-pointer max-[992px]:w-fit max-[992px]:pl-[5px] z-30"
         >
             {/* Texte visible uniquement sur écrans ≥ 992px */}
             <div className="max-[992px]:hidden">Powered by</div>
             {/* Logo responsive */}
-            <div className="h-[30px] max-[992px]:h-[25px]">
+            <div className="sm:h-[10px] md:h-[30px] max-[992px]:h-[25px]">
                 <img
                     src={`${import.meta.env.BASE_URL}logo_asy.png`}
                     alt="Asylum Logo"
-                    className="w-[20px] h-[20px] md:w-[30px] md:h-[30px] transition-all duration-300 group-hover:brightness-0 group-hover:invert" />
+                    className="w-[10px] h-[10px] md:w-[30px] md:h-[30px] transition-all duration-300 group-hover:brightness-0 group-hover:invert" />
             </div>
         </div>
     );
