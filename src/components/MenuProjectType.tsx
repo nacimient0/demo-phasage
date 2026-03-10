@@ -36,19 +36,19 @@ function ProjectTypeButton({ label, onClick, isSelected, isExpanded }: ProjectTy
     return (
         <button
             onClick={onClick}
-            className={`inline-flex items-center md:h-10 sm:h-8 justify-start text-black md:gap-3 sm:gap-2 border border-black md:px-4 sm:px-2 md:text-sm sm:text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer -mt-[1px] first:mt-0
+            className={`inline-flex items-center h-7 lg:h-10 justify-start text-black gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer -mt-[1px] first:mt-0
                 ${isSelected
-                    ? "bg-white z-10 md:border-r-0"
-                    : "bg-white hover:bg-[#E30613] hover:text-white hover:z-10 md:mr-[-1px]"
+                    ? "bg-white z-10 lg:border-r-0"
+                    : "bg-white hover:bg-[#E30613] hover:text-white hover:z-10 lg:mr-[-1px]"
                 }`}
         >
-            <Icon className="md:w-6 md:h-6 shrink-0 sm:w-5 sm:h-5" />
-            <span className="flex-1 text-left">{label}</span>
+            <Icon className="w-4 h-4 lg:w-6 lg:h-6 shrink-0" />
+            <span className="flex-1 text-left whitespace-nowrap">{label}</span>
             {isSelected && (
                 isExpanded ? (
-                    <ChevronUp className="md:w-4 md:h-4 shrink-0 sm:w-3 sm:h-3" />
+                    <ChevronUp className="w-3 h-3 lg:w-4 lg:h-4 shrink-0" />
                 ) : (
-                    <ChevronDown className="md:w-4 md:h-4 shrink-0 sm:w-3 sm:h-3" />
+                    <ChevronDown className="w-3 h-3 lg:w-4 lg:h-4 shrink-0" />
                 )
             )}
         </button>

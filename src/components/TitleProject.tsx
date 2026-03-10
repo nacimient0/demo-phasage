@@ -2,9 +2,9 @@ import { EiffageConstruction } from "./custom-svg/EiffageConstruction"
 
 export function TitleProject() {
     return (
-        <div className="flex flex-row md:gap-10 md:h-10 items-center font-medium uppercase md:text-lg text-black bg-white md:px-6 border border-black sm:text-xs sm:gap-4 sm:h-8 sm:px-4">
+        <div className="flex flex-row gap-3 px-4 h-7 w-full lg:gap-10 lg:h-10 items-center font-medium uppercase text-[10px] lg:text-lg text-black bg-white px-2 lg:px-6 border border-black whitespace-nowrap">
             Opération La Norma - Sense
-            <EiffageConstruction className="md:w-26 sm:w-18" />
+            <EiffageConstruction className="w-16 lg:w-26" />
         </div>
     )
 }

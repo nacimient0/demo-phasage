@@ -11,13 +11,13 @@ export function PhaseTimeline() {
     // Mode Installation
     if (mode === "installation") {
         return (
-            <div className="absolute flex bottom-2 md:bottom-8 left-0 right-0 px-2 md:px-0">
+            <div className="absolute flex bottom-2 lg:bottom-8 left-0 right-0 px-2 lg:px-0">
                 <div className="flex mx-auto">
-                    <div className="flex relative border rounded-full border-white w-fit px-3 md:px-6 gap-3 md:gap-10 bg-white/30 backdrop-blur-none items-center">
+                    <div className="flex relative border rounded-full border-white w-fit px-3 lg:px-6 gap-3 lg:gap-10 bg-white/30 backdrop-blur-none items-center">
                         <TimelinePreviousButton />
-                        <div className="relative flex py-2 md:py-6 md:h-18">
+                        <div className="relative flex py-2 lg:py-6 lg:h-18">
                             <ProgressBar />
-                            <div className="relative flex items-center justify-between gap-4 md:gap-5">
+                            <div className="relative flex items-center justify-between gap-4 lg:gap-5">
                                 <InstallationPoints />
                             </div>
                         </div>
@@ -34,7 +34,7 @@ export function PhaseTimeline() {
     return (
         <>
             {/* ── DESKTOP ── */}
-            <div className="hidden md:absolute md:flex md:bottom-8 left-0 right-0">
+            <div className="hidden lg:absolute lg:flex lg:bottom-8 left-0 right-0">
                 <div className="flex mx-auto">
                     <div className="flex relative border rounded-full border-white w-fit px-6 gap-10 bg-white/30 backdrop-blur-none">
                         <TimelineControls />
@@ -52,7 +52,7 @@ export function PhaseTimeline() {
             </div>
             
             {/* ── MOBILE ── */}
-            <div className="md:hidden h-fit absolute flex bottom-2 left-0 right-0 px-2">
+            <div className="lg:hidden h-fit absolute flex bottom-2 left-0 right-0 px-2">
                 <div className="w-full overflow-x-auto pt-6 scrollbar-none">
                     <div className="flex relative border rounded-full border-white w-fit mx-auto px-2 gap-2 bg-white/30 backdrop-blur-none items-center">
                         <TimelineControls />

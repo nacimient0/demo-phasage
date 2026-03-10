@@ -6,11 +6,13 @@ import { PhaseBackground } from "@/components/PhaseBackground"
 import { RightContainer } from "@/components/RightContainer"
 import { MenuContainer } from "@/components/MenuContainer"
 import { Credits } from "@/components/Credits"
+import { PortraitBlocker } from "@/components/PortraitBlocker"
 
 function App() {
   return (
     <NavigationModeProvider>
       <StepperProvider>
+        <PortraitBlocker />
         <RightContainer />
         <MenuContainer />
         <PhaseBackground />

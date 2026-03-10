@@ -29,7 +29,7 @@ export function PhaseBackground() {
         : planningPhase?.name ?? ""
 
     return (
-        <div className="h-screen w-screen select-none">
+        <div className="fixed inset-0 w-full select-none" style={{ height: '100dvh' }}>
             <img
                 src={imageSrc}
                 alt={altText}

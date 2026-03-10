@@ -46,17 +46,17 @@ export function MassPlan() {
                 title={display ? "Replier le plan de masse" : "Déplier le plan de masse"}
             >
                 {display
-                    ? <Play onClick={() => setDisplay(false)} size={22} fill="black" className="md:rotate-90 sm:rotate-0" />
-                    : <Play onClick={() => setDisplay(true)} size={22} fill="black" className="md:rotate-270 sm:rotate-180" />
+                    ? <Play onClick={() => setDisplay(false)} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 lg:rotate-90" />
+                    : <Play onClick={() => setDisplay(true)} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 rotate-180 lg:rotate-270" />
                 }
             </div>
 
             {display && (
-                <div className="relative overflow-hidden border-2 border-white shadow-2xl">
+                <div className="flex relative overflow-hidden border-2 border-white shadow-2xl">
                     <img
                         src={`${import.meta.env.BASE_URL}MassPlan.jpg`}
                         alt="Mass Plan"
-                        className="w-full h-auto max-w-xs md:max-w-sm max-h-[35vh] shadow-lg object-cover pointer-events-none"
+                        className="w-full h-auto shadow-lg object-cover pointer-events-none"
                     />
                     {/* Cônes de vision */}
                     {isInstallation ? (
@@ -69,10 +69,11 @@ export function MassPlan() {
                                 rotate={view.conePosition.rotate}
                                 active={index === installationIndex}
                             />
-                        ))                    ) : (
+                        ))
+                    ) : (
                         // Mode planning/phasage : 1 seul cône
-                        <div className="absolute pointer-events-none rotate-[340deg]" style={{ bottom: "45%", left: "8%" }}>
-                            <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 16, minHeight: 16, maxWidth: 40, maxHeight: 40 }}>
+                        <div className="absolute bottom-0 left-3 pointer-events-none rotate-[340deg]">
+                            <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
                                 <defs>
                                     <radialGradient id="eye-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(7.25512,0,0,11.0104,7.90496,11.9798)">
                                         <stop offset="0" style={{ stopColor: "red", stopOpacity: 1 }} />

@@ -76,10 +76,9 @@ export function DownloadPNG() {
     return (
         <button
             onClick={downloadImage}
-            title="Télécharger une capture d'écran"
-            className="inline-flex md:size-10 sm:size-8 text-black items-center justify-center border border-t-0 border-black bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
+            title="Télécharger une capture d'écran"            className="inline-flex size-7 lg:size-10 text-black items-center justify-center border border-t-0 border-black bg-background hover:bg-[#E30613] hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 select-none"
         >
-            <Download className="md:w-6 md:h-6 sm:w-5 sm:h-5" animateOnHover />
+            <Download className="w-4 h-4 lg:w-6 lg:h-6" animateOnHover />
         </button>
     );
 }

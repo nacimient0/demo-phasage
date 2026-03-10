@@ -18,20 +18,18 @@ const VIEWPOINTS_DEFAULT = [
 ]
 
 function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {
-    return (
-        <button
-            onClick={onClick}
-            className={`text-black inline-flex items-center md:h-10 sm:h-8 justify-start md:gap-3 sm:gap-2 border border-black md:px-4 sm:px-2 md:text-sm sm:text-xs font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] first:mt-0 ${isSelected
+    return (        <button
+            onClick={onClick}            className={`text-black inline-flex items-center h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] first:mt-0 ${isSelected
                 ? "bg-white text-black z-10"
                 : "bg-white text-black hover:bg-[#E30613] hover:text-white hover:z-10"
                 }`}
         >
-            <Viewpoint className="md:w-6 md:h-6 shrink-0 sm:w-5 sm:h-5" />
-            <span className="flex-1 text-left">{label}</span>
+            <Viewpoint className="w-4 h-4 lg:w-6 lg:h-6 shrink-0" />
+            <span className="flex-1 text-left whitespace-nowrap">{label}</span>
             {isSelected && showChevron && (
                 isExpanded
-                    ? <ChevronUp className="md:w-4 md:h-4 h-4 shrink-0 sm:w-3 sm:h-3" />
-                    : <ChevronDown className="md:w-4 md:h-4 h-4 shrink-0 sm:w-3 sm:h-3" />
+                    ? <ChevronUp className="w-3 h-3 lg:w-4 lg:h-4 shrink-0" />
+                    : <ChevronDown className="w-3 h-3 lg:w-4 lg:h-4 shrink-0" />
             )}
         </button>
     )
