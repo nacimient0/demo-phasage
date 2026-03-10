@@ -13,7 +13,7 @@ export function PhaseTimeline() {
         return (
             <div className="absolute flex bottom-2 lg:bottom-8 left-0 right-0 px-2 lg:px-0">
                 <div className="flex mx-auto">
-                    <div className="flex relative border rounded-full border-white w-fit px-3 lg:px-6 gap-3 lg:gap-10 bg-white/30 backdrop-blur-none items-center">
+                    <div className="flex relative py-2 border rounded-full border-white w-fit px-3 lg:px-6 gap-3 lg:gap-10 bg-white/30 backdrop-blur-none items-center">
                         <TimelinePreviousButton />
                         <div className="relative flex py-2 lg:py-6 lg:h-18">
                             <ProgressBar />
@@ -50,11 +50,11 @@ export function PhaseTimeline() {
                     </div>
                 </div>
             </div>
-            
+
             {/* ── MOBILE ── */}
             <div className="lg:hidden h-fit absolute flex bottom-2 left-0 right-0 px-2">
-                <div className="w-full overflow-x-auto pt-6 scrollbar-none">
-                    <div className="flex relative border rounded-full border-white w-fit mx-auto px-2 gap-2 bg-white/30 backdrop-blur-none items-center">
+                <div className="w-full scrollbar-none">
+                    <div className="flex relative border py-2 rounded-full border-white w-fit mx-auto px-2 gap-2 bg-white/30 backdrop-blur-none items-center">
                         <TimelineControls />
                         <TimelinePreviousButton />
                         <div className="relative flex py-2 w-full">

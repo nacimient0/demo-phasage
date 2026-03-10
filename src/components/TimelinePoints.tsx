@@ -10,7 +10,7 @@ export function PhaseIndicator() {
     if (!currentPhase) return null
     return (
         <div
-            className="absolute -top-7 lg:-top-10 px-2 lg:px-4 py-0.5 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-semibold text-white shadow-lg transition-all duration-300 whitespace-nowrap"
+            className="absolute -top-7 lg:-top-10 px-2 lg:px-4 py-0.5 lg:py-1.5 rounded-full text-[9px] lg:text-xs font-semibold text-white shadow-lg transition-all duration-300 whitespace-nowrap"
             style={{
                 backgroundColor: currentPhase.color,
                 insetInlineStart: `${((currentPhase.startPoint - 1) / totalPoints) * 100}%`,
@@ -40,7 +40,7 @@ export function TimelinePoints() {
                             {/* Nom de la phase au-dessus : toujours visible en desktop, uniquement phase active en mobile */}
                             <div
                                 className={cn(
-                                    "absolute -top-5 lg:-top-8 px-2 lg:px-3 py-0.5 lg:py-1 rounded-full font-semibold text-white shadow-lg whitespace-nowrap",
+                                    "absolute -top-6.5 lg:-top-8 px-2 lg:px-3 py-0.5 lg:py-1 rounded-full font-semibold text-white shadow-lg whitespace-nowrap",
                                     isCurrentPhase ? "text-[10px] lg:text-sm" : "hidden lg:block text-[9px] opacity-75 lg:text-xs"
                                 )}
                                 style={{ backgroundColor: phase.color }}
@@ -49,12 +49,12 @@ export function TimelinePoints() {
                             </div>
                             <button
                                 onClick={() => goToPhase(index)}
-                                className="relative z-10 transition-all duration-300 hover:scale-110 cursor-pointer focus:outline-none"
+                                className="relative z-10 transition-all duration-300 cursor-pointer focus:outline-none"
                             >
                                 <Badge
                                     className={cn(
-                                        "size-6 lg:size-8 rounded-full flex items-center justify-center font-bold text-[10px] hover:shadow-lg transition-all border",
-                                        isCurrentPhase && "size-8 lg:size-10 ring-2 ring-primary/30 shadow-xl"
+                                        "size-6 lg:size-8 rounded-full flex items-center justify-center font-bold text-[10px] transition-all border",
+                                        isCurrentPhase ? "scale-110 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
                                     )}
                                     style={{
                                         backgroundColor: isCompleted || isCurrentPhase ? phase.color : "var(--muted)",
@@ -89,7 +89,7 @@ export function TimelinePoints() {
                         onMouseLeave={() => setHoveredPointId(null)}
                     >
                         {isCurrentPoint && (
-                            <div className="absolute -bottom-4 text-[9px] lg:text-[10px] text-center text-white bg-black/50 rounded px-0.5 font-medium whitespace-nowrap pointer-events-none z-40">
+                            <div className="absolute -bottom-4.5 lg:-bottom-5 text-[9px] px-2lg:text-[10px] text-center text-white bg-black/50 rounded px-0.5 font-medium whitespace-nowrap pointer-events-none z-40">
                                 {step.label}
                             </div>
                         )}
@@ -103,12 +103,12 @@ export function TimelinePoints() {
                         )}
                         <button
                             onClick={() => goToPoint(pointId)}
-                            className="relative z-10 transition-all duration-300 hover:scale-110 cursor-pointer focus:outline-none"
+                            className="relative z-10 px-2transition-all duration-300 cursor-pointer focus:outline-none"
                         >
                             <Badge
                                 className={cn(
-                                    "size-5 lg:size-7 rounded-full flex items-center justify-center font-bold text-[10px] hover:shadow-lg transition-all border",
-                                    isCurrentPoint && "size-7 lg:size-10 ring-2 ring-primary/30 shadow-xl"
+                                    "size-5 lg:size-7 rounded-full flex items-center justify-center font-bold text-[10px] transition-all border",
+                                    isCurrentPoint ? "scale-125 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
                                 )}
                                 style={{
                                     backgroundColor: isCompleted || isCurrentPoint ? step.color : "var(--muted)",
@@ -138,12 +138,12 @@ export function InstallationPoints() {
                     <div key={view.id} className="relative flex flex-col items-center group">
                         <button
                             onClick={() => goTo(index)}
-                            className="relative z-10 transition-all duration-300 hover:scale-110 cursor-pointer focus:outline-none"
+                            className="relative z-10 transition-all duration-300 cursor-pointer focus:outline-none"
                         >
                             <Badge
                                 className={cn(
-                                    "size-6 lg:size-8 rounded-full flex items-center justify-center font-bold text-xs hover:shadow-lg transition-all border",
-                                    isActive && "size-8 lg:size-10 ring-2 shadow-xl"
+                                    "size-6 lg:size-8 rounded-full flex items-center justify-center font-bold text-xs transition-all border",
+                                    isActive ? "scale-125 ring-2 shadow-xl" : "hover:scale-110 hover:shadow-lg"
                                 )}
                                 style={{
                                     backgroundColor: isActive ? "#64748b" : "white",
