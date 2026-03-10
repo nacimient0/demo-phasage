@@ -50,10 +50,9 @@ export function PhaseTimeline() {
                     </div>
                 </div>
             </div>
-
             {/* ── MOBILE ── */}
             <div className="lg:hidden h-fit absolute flex bottom-2 left-0 right-0 px-2">
-                <div className="w-full scrollbar-none">
+                <div className="w-full overflow-x-auto scrollbar-none pt-6 pb-1">
                     <div className="flex relative border py-2 rounded-full border-white w-fit mx-auto px-2 gap-2 bg-white/30 backdrop-blur-none items-center">
                         <TimelineControls />
                         <TimelinePreviousButton />
