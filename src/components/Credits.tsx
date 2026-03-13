@@ -6,11 +6,11 @@ export function Credits() {
     return (
         <div
             onClick={handleClick}
-            className="group fixed bottom-0 right-0 flex items-center justify-evenly w-[6vw] h-[35px] rounded-tl-[14px] bg-white text-[11px] font-bold p-[2px] text-black
-        transition-all duration-300 hover:bg-red-600 hover:text-white cursor-pointer max-[992px]:w-fit max-[992px]:pl-[5px] z-30"
+            className="group fixed bottom-0 right-0 hidden lg:flex items-center justify-evenly w-[6vw] h-[35px] rounded-tl-[14px] bg-white text-[11px] font-bold p-[2px] text-black
+        transition-all duration-300 hover:bg-red-600 hover:text-white cursor-pointer z-30"
         >
             {/* Texte visible uniquement sur écrans ≥ 992px */}
-            <div className="max-[992px]:hidden">Powered by</div>
+            <div>Powered by</div>
             {/* Logo responsive */}
             <div className="h-[15px] lg:h-[30px]">
                 <img

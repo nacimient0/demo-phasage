@@ -18,8 +18,9 @@ const VIEWPOINTS_DEFAULT = [
 ]
 
 function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {
-    return (        <button
-            onClick={onClick}            className={`text-black inline-flex items-center h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] first:mt-0 ${isSelected
+    return (
+        <button
+            onClick={onClick} className={`text-black inline-flex items-center h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] lg:first:mt-0 ${isSelected
                 ? "bg-white text-black z-10"
                 : "bg-white text-black hover:bg-[#E30613] hover:text-white hover:z-10"
                 }`}

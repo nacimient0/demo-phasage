@@ -50,6 +50,7 @@ export function PhaseTimeline() {
                     </div>
                 </div>
             </div>
+
             {/* ── MOBILE ── */}
             <div className="lg:hidden h-fit absolute flex bottom-2 left-0 right-0 px-2">
                 <div className="w-full overflow-x-auto scrollbar-none pt-6 pb-1">

@@ -64,16 +64,22 @@ const PROJECT_TYPES = [
 export function MenuProjectType() {
     const { mode, setMode } = useNavigationMode()
     const [isExpanded, setIsExpanded] = useState(false)
-    const { goToPoint, setIsPlaying, currentPointId } = useStepper()
+    const { goToPoint, setIsPlaying, currentPointId, isPlaying } = useStepper()
     const { installationIndex } = useInstallationNav()
     const containerRef = useRef<HTMLDivElement>(null)
-
     const selectedLabel = MODE_TO_LABEL[mode]
+    const isPlayingRef = useRef(isPlaying)
 
-    // Fermer le menu quand le mode, le point de vue ou le point planning change
+    // Garder la ref synchronisée sans déclencher de re-render
+    useEffect(() => { isPlayingRef.current = isPlaying }, [isPlaying])
+
+    // Fermer le menu quand le mode ou l'installation change
+    useEffect(() => { setIsExpanded(false) }, [mode, installationIndex])
+
+    // Fermer le menu quand le point change, SAUF pendant le play
     useEffect(() => {
-        setIsExpanded(false)
-    }, [mode, installationIndex, currentPointId])
+        if (!isPlayingRef.current) setIsExpanded(false)
+    }, [currentPointId])
 
     // Fermer le menu au clic extérieur
     useEffect(() => {
