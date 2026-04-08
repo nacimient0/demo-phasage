@@ -8,6 +8,7 @@ export function ProgressBar() {
     const { mode } = useNavigationMode()
     const { phaseIndex } = usePhasageNav()
     const { installationIndex } = useInstallationNav()
+    
     // ── MODE PLANNING ─────────────────────────────────────────────
     if (mode === "planning") {
         const currentPhaseIndex = phases.findIndex(
@@ -35,7 +36,7 @@ export function ProgressBar() {
                     />
                 )}
                 {/* Barre de progression par segments de phase */}
-                <div className="absolute top-1/2 left-0 right-0 h-2 -translate-y-1/2 z-[2] flex">
+                {/* <div className="absolute top-1/2 left-0 right-0 h-2 -translate-y-1/2 z-[2] flex">
                     {phases.map((phase, index) => {
                         const phasePoints = phase.endPoint - phase.startPoint + 1
                         const segmentWidth = `${(phasePoints / totalPoints) * 100}%`
@@ -67,7 +68,7 @@ export function ProgressBar() {
                             </div>
                         )
                     })}
-                </div>
+                </div> */}
             </>
         )
     }

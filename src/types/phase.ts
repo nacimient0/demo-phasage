@@ -14,6 +14,9 @@ export interface Phase {
   startPoint: number
   endPoint: number
   image?: string
+  folder?: string
+  prefix?: string
+  frameCount?: number
 }
 
 export type ViewMode = "phase" | "numbered"

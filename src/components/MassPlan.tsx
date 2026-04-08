@@ -1,12 +1,13 @@
+
 import { useState } from "react";
 import { Play } from "@/components/animate-ui/icons/play"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
-import { useInstallationNav } from "@/hooks/useNavigationNav"
+import { useInstallationNav, usePhasageNav } from "@/hooks/useNavigationNav"
+import { useStepper } from "@/contexts/StepperContext"
 import { installationViews } from "@/data/phases"
 
-// Positions et rotations des cônes : lues depuis installationViews dans phases.ts
-
-// SVG cône de vision réutilisable
+// Positions et rotations des c�nes : lues depuis installationViews dans phases.ts
+// SVG c�ne de vision r�utilisable
 function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: string, left: string, active: boolean }) {
     return (
         <div
@@ -36,7 +37,22 @@ export function MassPlan() {
     const [display, setDisplay] = useState(true);
     const { mode } = useNavigationMode()
     const { installationIndex } = useInstallationNav()
+    const { currentPhase: phasagePhase } = usePhasageNav()
+    const { currentPhase: planningPhase } = useStepper()
+
     const isInstallation = mode === "installation"
+
+    // D�duire l`id de la phase courante pour afficher la bonne minimap
+    let phaseId = 0;
+    if (mode === "phasage" && phasagePhase) {
+        phaseId = phasagePhase.id - 1;
+    } else if (mode === "planning" && planningPhase) {
+        phaseId = planningPhase.id - 1;
+    }
+
+    const minimapSrc = isInstallation
+        ? `${import.meta.env.BASE_URL}MassPlan.jpg`
+        : `${import.meta.env.BASE_URL}minimaps/phase0${phaseId}.webp`
 
     return (
         <div className="relative w-fit select-none">
@@ -54,13 +70,14 @@ export function MassPlan() {
             {display && (
                 <div className="flex relative overflow-hidden border-2 border-white shadow-2xl">
                     <img
-                        src={`${import.meta.env.BASE_URL}MassPlan.jpg`}
+                        src={minimapSrc}
                         alt="Mass Plan"
                         className="w-full h-auto shadow-lg object-cover pointer-events-none"
                     />
-                    {/* Cônes de vision */}
+
+                    {/* C�nes de vision */}
                     {isInstallation ? (
-                        // Mode installation : 3 cônes, celui actif en pleine opacité
+                        // Mode installation : 3 c�nes, celui actif en pleine opacit�
                         installationViews.map((view, index) => (
                             <VisionCone
                                 key={view.id}
@@ -71,7 +88,7 @@ export function MassPlan() {
                             />
                         ))
                     ) : (
-                        // Mode planning/phasage : 1 seul cône
+                        // Mode planning/phasage : 1 seul c�ne
                         <div className="absolute bottom-0 left-3 pointer-events-none rotate-[340deg]">
                             <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
                                 <defs>
@@ -95,3 +112,5 @@ export function MassPlan() {
         </div>
     )
 }
+
+

@@ -1,72 +1,51 @@
-// @ts-nocheck
-
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface AuthContextType {
     token: string | null;
-    userId: number | null;
+    userId: string | null;
     userName: string | null;
-    setToken: (token: string, userId: number, userName: string) => void;
-    logout: () => void;
+    setToken: (token: string | null, userId?: string | null, userName?: string | null) => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-    token: null,
-    userId: null,
-    userName: null,
-    setToken: () => { },
-    logout: () => { },
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface Props {
-    children: ReactNode;
-}
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [token, setTokenState] = useState<string | null>(localStorage.getItem("token"));
+    const [userId, setUserId] = useState<string | null>(localStorage.getItem("userId"));
+    const [userName, setUserName] = useState<string | null>(localStorage.getItem("userName"));
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [token, setTokenState] = useState<string | null>(null);
-    const [userId, setUserId] = useState<number | null>(null);
-    const [userName, setUserName] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true); // ← nouvel état
-
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        const storedUserId = localStorage.getItem("userId");
-        const storedUserName = localStorage.getItem("userName");
-
-        if (storedToken && storedUserId && storedUserName) {
-            setTokenState(storedToken);
-            setUserId(Number(storedUserId));
-            setUserName(storedUserName);
+    const setToken = (newToken: string | null, newUserId?: string | null, newUserName?: string | null) => {
+        setTokenState(newToken);
+        if (newToken) {
+            localStorage.setItem("token", newToken);
+            if (newUserId) {
+                setUserId(newUserId);
+                localStorage.setItem("userId", newUserId);
+            }
+            if (newUserName) {
+                setUserName(newUserName);
+                localStorage.setItem("userName", newUserName);
+            }
+        } else {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userName");
+            setUserId(null);
+            setUserName(null);
         }
-        setLoading(false); // ← on a fini de récupérer le token
-    }, []);
-
-    const setToken = (token: string, userId: number, userName: string) => {
-        localStorage.setItem("token", token);
-        localStorage.setItem("userId", userId.toString());
-        localStorage.setItem("userName", userName);
-        setTokenState(token);
-        setUserId(userId);
-        setUserName(userName);
     };
-
-    const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("userName");
-        setTokenState(null);
-        setUserId(null);
-        setUserName(null);
-    };
-
-    if (loading) return null; 
 
     return (
-        <AuthContext.Provider value={{ token, userId, userName, setToken, logout }}>
+        <AuthContext.Provider value={{ token, userId, userName, setToken }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+};

@@ -16,6 +16,7 @@ export interface NavigationModeContextType {
     setTimelineVisible: (v: boolean) => void
 }
 
+
 export const NavigationModeContext = createContext<NavigationModeContextType | null>(null)
 
 export function NavigationModeProvider({ children }: { children: ReactNode }) {

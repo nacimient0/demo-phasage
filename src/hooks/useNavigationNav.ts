@@ -3,6 +3,7 @@ import { useNavigationMode } from "@/contexts/NavigationModeContext"
 
 export function usePhasageNav() {
     const { phaseIndex, setPhaseIndex } = useNavigationMode()
+    
     return {
         phaseIndex,
         currentPhase: phases[phaseIndex],
