@@ -44,18 +44,35 @@ export function PhaseBackground() {
         )
     }
 
-    return (
-        <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
-            <img
-                src={imageSrc}
-                alt={altText}
-                className={cn(
-                    "w-full h-full object-cover transition-opacity duration-500 pointer-events-none",
-                    mode === "installation" ? "object-bottom" : "object-center"
-                )}
-            />
-        </div>
-    )
+    if (mode === "installation") {
+        return (
+            <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
+                <img
+                    src={imageSrc}
+                    alt={altText}
+                    className={cn(
+                        "w-full h-full object-cover transition-opacity duration-500 pointer-events-none",
+                        mode === "installation" ? "object-bottom" : "object-center"
+                    )}
+                />
+            </div>
+        )
+    }
+
+    if (mode === "planning" && planningPhase) {
+        const folderId = String((planningPhase?.id || 1) - 1).padStart(2, "0")
+        return (
+            <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
+                <Player360
+                    folder={`Phase_${folderId}`}
+                    prefix="Phasage"
+                    frameCount={90}
+                />
+            </div>
+        )
+    }
+
 }
+
 
 

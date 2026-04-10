@@ -37,8 +37,8 @@ function App() {
         <Routes>
           <Route path="/" element={<AppContent />} />
           <Route path="/eiffage" element={<AppContent />} />
-          <Route path="/eiffage/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
-          <Route path="/eiffage/login" element={<Login />} />
+          {/* <Route path="/eiffage/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} /> */}
+          {/* <Route path="/eiffage/login" element={<Login />} /> */}
         </Routes>
       </Router>
     </AuthProvider>

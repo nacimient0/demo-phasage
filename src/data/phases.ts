@@ -4,9 +4,10 @@ export interface InstallationView {
     id: number
     label: string        // Nom affiché dans MenuViewPoint
     image: string        // Chemin relatif au dossier public
+    minimap: string      // Chemin relatif au dossier public de la minimap associée
     conePosition: {      // Position du cône sur le plan de masse
         bottom: string
-        left: string
+        left?: string
         rotate: string
     }
 }
@@ -16,19 +17,22 @@ export const installationViews: InstallationView[] = [
         id: 1,
         label: "Vue zone de déchargement - Rue Paul LAFARGE",
         image: "installation/VUE_PIC_001.webp",
-        conePosition: { bottom: "0%", left: "8%", rotate: "rotate-[300deg]" },
+        minimap: "minimaps/phase02.webp",
+        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
     },
     {
         id: 2,
         label: "Vue zone de déchargement - Rue Jean JAURÈS",
         image: "installation/VUE_PIC_002.webp",
-        conePosition: { bottom: "55%", left: "90%", rotate: "rotate-[175deg]" },
+        minimap: "minimaps/phase05.webp",
+        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
     },
     {
         id: 3,
         label: "Vue base vie et zones de déchargement - Rue Paul LAFARGE",
         image: "installation/VUE_PIC_003.webp",
-        conePosition: { bottom: "0%", left: "50%", rotate: "rotate-[270deg]" },
+        minimap: "minimaps/phase06.webp",
+        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
     },
 ]
 

@@ -14,17 +14,20 @@ export interface NavigationModeContextType {
     setInstallationIndex: (i: number) => void
     timelineVisible: boolean
     setTimelineVisible: (v: boolean) => void
+    currentFrame: number
+    setCurrentFrame: (f: number) => void
 }
-
 
 export const NavigationModeContext = createContext<NavigationModeContextType | null>(null)
 
 export function NavigationModeProvider({ children }: { children: ReactNode }) {
-    const [mode, setMode] = useState<NavigationMode>(        () => (localStorage.getItem("projectMode") as NavigationMode) ?? "planning"
+    const [mode, setMode] = useState<NavigationMode>(
+        () => (localStorage.getItem("projectMode") as NavigationMode) ?? "planning"
     )
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [installationIndex, setInstallationIndex] = useState(0)
     const [timelineVisible, setTimelineVisible] = useState(true)
+    const [currentFrame, setCurrentFrame] = useState(24) // <--- Gestion globale de la frame 360
 
     const handleSetMode = (newMode: NavigationMode) => {
         localStorage.setItem("projectMode", newMode)
@@ -43,6 +46,8 @@ export function NavigationModeProvider({ children }: { children: ReactNode }) {
             setInstallationIndex,
             timelineVisible,
             setTimelineVisible,
+            currentFrame,
+            setCurrentFrame,
         }}>
             {children}
         </NavigationModeContext.Provider>
@@ -54,3 +59,4 @@ export function useNavigationMode() {
     if (!context) throw new Error("useNavigationMode must be used within NavigationModeProvider")
     return context
 }
+

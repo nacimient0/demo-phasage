@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Play } from "@/components/animate-ui/icons/play"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
@@ -6,13 +5,11 @@ import { useInstallationNav, usePhasageNav } from "@/hooks/useNavigationNav"
 import { useStepper } from "@/contexts/StepperContext"
 import { installationViews } from "@/data/phases"
 
-// Positions et rotations des c�nes : lues depuis installationViews dans phases.ts
-// SVG c�ne de vision r�utilisable
 function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: string, left: string, active: boolean }) {
     return (
         <div
-            className={`absolute pointer-events-none ${rotate} transition-opacity duration-300 ${active ? "opacity-100" : "opacity-0"}`}
-            style={{ bottom, left }}
+            className={`absolute pointer-events-none transition-transform duration-100 ${active ? "opacity-100" : "opacity-0"}`}
+            style={{ bottom, left, transform: rotate ? rotate.replace("rotate-[", "rotate(").replace("deg]", "deg)") : "rotate(0deg)" }}
         >
             <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 40, maxHeight: 40 }}>
                 <defs>
@@ -35,14 +32,13 @@ function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: 
 
 export function MassPlan() {
     const [display, setDisplay] = useState(true);
-    const { mode } = useNavigationMode()
+    const { mode, currentFrame } = useNavigationMode()
     const { installationIndex } = useInstallationNav()
     const { currentPhase: phasagePhase } = usePhasageNav()
     const { currentPhase: planningPhase } = useStepper()
 
     const isInstallation = mode === "installation"
 
-    // D�duire l`id de la phase courante pour afficher la bonne minimap
     let phaseId = 0;
     if (mode === "phasage" && phasagePhase) {
         phaseId = phasagePhase.id - 1;
@@ -51,12 +47,18 @@ export function MassPlan() {
     }
 
     const minimapSrc = isInstallation
-        ? `${import.meta.env.BASE_URL}MassPlan.jpg`
+        ? `${import.meta.env.BASE_URL}${installationViews[installationIndex].minimap}`
         : `${import.meta.env.BASE_URL}minimaps/phase0${phaseId}.webp`
+
+    // Calcul de la rotation en fonction de la frame (max 90 frames = 360 deg)
+    // baseRotation = -40 deg. 
+    // frame = 0 -> -40 deg, frame = 90 -> 320 deg.
+    const rotationRatio = (currentFrame / 90) * 360;
+    const baseRotation = 90;
+    const dynamicRotation = baseRotation + rotationRatio;
 
     return (
         <div className="relative w-fit select-none">
-            {/* Bouton toggle TOUJOURS visible, hors du overflow-hidden */}
             <div
                 className="absolute top-2 right-2 z-20 cursor-pointer shadow-2xl bg-white"
                 title={display ? "Replier le plan de masse" : "Déplier le plan de masse"}
@@ -75,21 +77,25 @@ export function MassPlan() {
                         className="w-full h-auto shadow-lg object-cover pointer-events-none"
                     />
 
-                    {/* C�nes de vision */}
                     {isInstallation ? (
-                        // Mode installation : 3 c�nes, celui actif en pleine opacit�
                         installationViews.map((view, index) => (
                             <VisionCone
                                 key={view.id}
-                                bottom={view.conePosition.bottom}
-                                left={view.conePosition.left}
-                                rotate={view.conePosition.rotate}
+                                bottom={view.conePosition.bottom || ""}
+                                left={view.conePosition.left || ""}
+                                rotate={view.conePosition.rotate || ""}
                                 active={index === installationIndex}
                             />
                         ))
                     ) : (
-                        // Mode planning/phasage : 1 seul c�ne
-                        <div className="absolute bottom-0 left-3 pointer-events-none rotate-[340deg]">
+                        <div
+                            className="absolute pointer-events-none transition-transform duration-100"
+                            style={{
+                                bottom: "0%",
+                                left: "50%",
+                                transform: `rotate(${dynamicRotation}deg)`
+                            }}
+                        >
                             <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
                                 <defs>
                                     <radialGradient id="eye-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(7.25512,0,0,11.0104,7.90496,11.9798)">
@@ -112,5 +118,4 @@ export function MassPlan() {
         </div>
     )
 }
-
 
