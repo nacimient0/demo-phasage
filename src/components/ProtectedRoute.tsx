@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }: Props) => {
     const { token } = useAuth();
 
     if (!token) {
-        return <Navigate to="/eiffage/login" replace />;
+        return <Navigate to="/eria/login" replace />;
     }
 
     return children;

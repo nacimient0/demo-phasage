@@ -7,7 +7,7 @@ export default function Connected() {
 
     const handleLogout = () => {
         logout();
-        navigate("/eiffage/login");
+        navigate("/eria/login");
     };
 
     return (
@@ -27,7 +27,7 @@ export default function Connected() {
                 </div>
             ) : (
                 <div className="flex gap-4">
-                    <Link to="/eiffage/login" className="font-bold hover:text-blue-500 transition">
+                    <Link to="/eria/login" className="font-bold hover:text-blue-500 transition">
                         SE CONNECTER
                     </Link>
                 </div>

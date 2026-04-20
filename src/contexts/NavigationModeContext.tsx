@@ -27,7 +27,7 @@ export function NavigationModeProvider({ children }: { children: ReactNode }) {
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [installationIndex, setInstallationIndex] = useState(0)
     const [timelineVisible, setTimelineVisible] = useState(true)
-    const [currentFrame, setCurrentFrame] = useState(24) // <--- Gestion globale de la frame 360
+    const [currentFrame, setCurrentFrame] = useState(0)
 
     const handleSetMode = (newMode: NavigationMode) => {
         localStorage.setItem("projectMode", newMode)

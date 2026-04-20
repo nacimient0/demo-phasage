@@ -51,11 +51,21 @@ export function MassPlan() {
         : `${import.meta.env.BASE_URL}minimaps/phase0${phaseId}.webp`
 
     // Calcul de la rotation en fonction de la frame (max 90 frames = 360 deg)
-    // baseRotation = -40 deg. 
-    // frame = 0 -> -40 deg, frame = 90 -> 320 deg.
-    const rotationRatio = (currentFrame / 90) * 360;
-    const baseRotation = 90;
+    const rotationRatio = -(currentFrame / 90) * 360;
+    const baseRotation = 270;
     const dynamicRotation = baseRotation + rotationRatio;
+
+    const scaleX = 40; // Rayon horizontal de l'orbite en %
+    const scaleY = 40; // Rayon vertical de l'orbite en %
+    const centerX = 50; // Position X du centre de l'orbite en %
+    const centerY = 50; // Position Y du centre de l'orbite en %
+
+    // Convertir l'angle en radians (on décale pour synchroniser le point de départ)
+    const angleRad = (dynamicRotation - 180) * (Math.PI / 180);
+
+    // Calcul de la position
+    const orbitLeft = centerX + (scaleX * Math.cos(angleRad));
+    const orbitTop = centerY + (scaleY * Math.sin(angleRad));
 
     return (
         <div className="relative w-fit select-none">
@@ -89,11 +99,11 @@ export function MassPlan() {
                         ))
                     ) : (
                         <div
-                            className="absolute pointer-events-none transition-transform duration-100"
+                            className="absolute pointer-events-none transition-all duration-100"
                             style={{
-                                bottom: "0%",
-                                left: "50%",
-                                transform: `rotate(${dynamicRotation}deg)`
+                                top: `${orbitTop}%`,
+                                left: `${orbitLeft}%`,
+                                transform: `translate(-50%, -50%) rotate(${dynamicRotation}deg)`
                             }}
                         >
                             <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
