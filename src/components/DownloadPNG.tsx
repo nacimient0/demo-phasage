@@ -1,35 +1,39 @@
 "use client";
 import { useStepper } from "@/contexts/StepperContext";
 import { useNavigationMode } from "@/contexts/NavigationModeContext";
+import { usePhasageNav } from "@/hooks/useNavigationNav";
 import { useMemo } from "react";
 import { Download } from "@/components/animate-ui/icons/download";
+import { installationViews } from "@/data/phases";
 
 /**
  * Composant bouton de téléchargement PNG
  * Télécharge l'image de fond actuellement affichée
  */
 export function DownloadPNG() {
-    const { currentPhase, currentPointId } = useStepper();
-    const { mode } = useNavigationMode();
+    const { currentPhase: planningPhase } = useStepper();
+    const { currentPhase: phasagePhase } = usePhasageNav();
+    const { mode, installationIndex, currentFrame } = useNavigationMode();
 
-    // Calculer l'index d'installation (même logique que PhaseBackground)
-    const installationIndex = useMemo(() => {
-        if (mode !== "installation") return 0;
-        if (currentPointId <= 7) return 0;
-        if (currentPointId <= 15) return 1;
-        return 2;
-    }, [currentPointId, mode]);    // Déterminer l'image actuelle
+    // Déterminer l'image actuelle
     const imageSrc = useMemo(() => {
         const baseUrl = import.meta.env.BASE_URL;
+
+        // Formatage de la frame sur 4 chiffres (ex: 0045)
+        const frameStr = String(currentFrame || 0).padStart(4, "0");
+
         if (mode === "planning") {
-            return `${baseUrl}planning/Point_${currentPhase?.id}.jpg`;
+            const folderId = String((planningPhase?.id || 1) - 1).padStart(2, "0");
+            return `${baseUrl}phases/Phase_${folderId}/Phasage${frameStr}.webp`;
         } else if (mode === "phasage") {
-            return `${baseUrl}phases/Phase_${currentPhase?.id}.jpg`;
+            const folderId = String((phasagePhase?.id || 1) - 1).padStart(2, "0");
+            return `${baseUrl}phases/Phase_${folderId}/Phasage${frameStr}.webp`;
         } else if (mode === "installation") {
-            return `${baseUrl}installation/Installation_${installationIndex + 1}.jpg`;
+            const installImage = installationViews[installationIndex]?.image;
+            return installImage ? `${baseUrl}${installImage}` : "";
         }
-        return currentPhase?.image;
-    }, [mode, currentPhase, installationIndex]);
+        return "";
+    }, [mode, planningPhase, phasagePhase, installationIndex, currentFrame]);
 
     const downloadImage = async () => {
         try {
@@ -40,6 +44,12 @@ export function DownloadPNG() {
 
             // Récupérer l'image
             const response = await fetch(imageSrc);
+
+            // Ajouter la vérification du statut HTTP
+            if (!response.ok) {
+                throw new Error(`Erreur réseau: ${response.status} - L'image n'a pas pu être trouvée à l'adresse URL: ${imageSrc}`);
+            }
+
             const blob = await response.blob();
 
             // Créer un nom de fichier avec date (YYYYMMDD_HHMMSS)
@@ -50,13 +60,13 @@ export function DownloadPNG() {
             // Nom basé sur le mode et l'élément actuel
             let filename = `demo-phasage_${mode}_`;
             if (mode === "planning") {
-                filename += `point${currentPhase?.id}`;
+                filename += `phase${planningPhase?.id}_frame${currentFrame}`;
             } else if (mode === "phasage") {
-                filename += `phase${currentPhase?.id}`;
+                filename += `phase${phasagePhase?.id}_frame${currentFrame}`;
             } else if (mode === "installation") {
                 filename += `installation${installationIndex + 1}`;
             }
-            filename += `_${dateStr}_${timeStr}.jpg`;
+            filename += `_${dateStr}_${timeStr}.webp`;
 
             // Créer un lien de téléchargement
             const url = URL.createObjectURL(blob);

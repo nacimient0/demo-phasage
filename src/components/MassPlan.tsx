@@ -60,7 +60,6 @@ export function MassPlan() {
     const centerX = 50; // Position X du centre de l'orbite en %
     const centerY = 50; // Position Y du centre de l'orbite en %
 
-    // Convertir l'angle en radians (on décale pour synchroniser le point de départ)
     const angleRad = (dynamicRotation - 180) * (Math.PI / 180);
 
     // Calcul de la position
@@ -99,7 +98,7 @@ export function MassPlan() {
                         ))
                     ) : (
                         <div
-                            className="absolute pointer-events-none transition-all duration-100"
+                            className="absolute pointer-events-none"
                             style={{
                                 top: `${orbitTop}%`,
                                 left: `${orbitLeft}%`,

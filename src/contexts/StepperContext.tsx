@@ -64,7 +64,9 @@ export function StepperProvider({ children }: { children: ReactNode }) {
     // Navigation vers un point spécifique
     const goToPoint = useCallback((pointId: number) => {
         stepper.navigation.goTo(`step-${pointId}`)
-    }, [stepper.navigation])    // Auto-play : boucle infinie point par point
+    }, [stepper.navigation])
+
+    // Auto-play : boucle infinie point par point
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>
         if (isPlaying) {
