@@ -8,7 +8,7 @@ export function ProgressBar() {
     const { mode } = useNavigationMode()
     const { phaseIndex } = usePhasageNav()
     const { installationIndex } = useInstallationNav()
-    
+
     // ── MODE PLANNING ─────────────────────────────────────────────
     if (mode === "planning") {
         const currentPhaseIndex = phases.findIndex(
@@ -36,24 +36,33 @@ export function ProgressBar() {
                     />
                 )}
                 {/* Barre de progression par segments de phase */}
-                {/* <div className="absolute top-1/2 left-0 right-0 h-2 -translate-y-1/2 z-[2] flex">
+                <div className="absolute top-1/2 left-0 right-0 h-2 -translate-y-1/2 z-[2]">
                     {phases.map((phase, index) => {
-                        const phasePoints = phase.endPoint - phase.startPoint + 1
-                        const segmentWidth = `${(phasePoints / totalPoints) * 100}%`
+                        // Allonger le segment jusqu'au début de la phase suivante (ou la fin)
+                        const nextStartPoint = phases[index + 1] ? phases[index + 1].startPoint : totalPoints
+                        const spanIntervals = nextStartPoint - phase.startPoint
+                        const totalIntervals = totalPoints - 1
+
+                        const leftPosition = `${((phase.startPoint - 1) / totalIntervals) * 100}%`
+                        const segmentWidth = `${(spanIntervals / totalIntervals) * 100}%`
 
                         let fillPercentage = 0
                         if (index < currentPhaseIndex) {
                             fillPercentage = 100
                         } else if (index === currentPhaseIndex) {
-                            const pointsInPhase = currentPointId - phase.startPoint
-                            fillPercentage = (pointsInPhase / (phasePoints - 1)) * 100
+                            const completedIntervalsInPhase = currentPointId - phase.startPoint
+                            fillPercentage = Math.max(0, Math.min(100, (completedIntervalsInPhase / spanIntervals) * 100))
                         }
 
                         const isFirst = index === 0
                         const isLast = index === phases.length - 1
 
                         return (
-                            <div key={`phase-${phase.id}`} className="h-full relative" style={{ width: segmentWidth }}>
+                            <div
+                                key={`phase-${phase.id}`}
+                                className="h-full absolute top-0"
+                                style={{ left: leftPosition, width: segmentWidth }}
+                            >
                                 <div
                                     className="h-full transition-all duration-300"
                                     style={{
@@ -68,7 +77,7 @@ export function ProgressBar() {
                             </div>
                         )
                     })}
-                </div> */}
+                </div>
             </>
         )
     }
