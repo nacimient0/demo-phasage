@@ -32,7 +32,7 @@ export default function Login() {
 
     return (
         <div style={{
-            width: "100%", height: "100vh", backgroundImage: "url('/bg.webp')", backgroundSize: "cover",
+            width: "100%", height: "100vh", backgroundImage: "url('./bg.webp')", backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat", display: "flex", alignItems: "center", justifyContent: "center"
         }}>

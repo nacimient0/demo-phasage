@@ -175,7 +175,7 @@ export function Player360({ folder, prefix, frameCount = 90, className }: Player
                 className
             )}
             style={{
-                cursor: (!isDragging && currentZoom <= 1) ? 'url("/360.png") 16 7, auto' : undefined
+                cursor: (!isDragging && currentZoom <= 1) ? 'url("./360.png") 16 7, auto' : undefined
             }}
             onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
             onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
