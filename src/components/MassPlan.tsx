@@ -79,7 +79,7 @@ export function MassPlan() {
             </div>
 
             {display && (
-                <div className="flex relative overflow-hidden border-2 border-white shadow-2xl">
+                <div className="flex relative overflow-hidden border border-white shadow-2xl">
                     <img
                         src={minimapSrc}
                         alt="Mass Plan"

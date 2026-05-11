@@ -1,7 +1,7 @@
 import { MenuViewPoint } from "./MenuViewPoint"
 import { MenuProjectType } from "./MenuProjectType"
 import { Fullscreen } from "./FullScreen"
-import { DownloadPNG } from "./DownloadPNG"
+import { DownloadJPG } from "./DownloadJPG"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { PanelBottomClose } from "@/components/animate-ui/icons/panel-bottom-close"
 import { PanelTopClose } from "@/components/animate-ui/icons/panel-top-close"
@@ -24,7 +24,7 @@ export function MenuContainer() {
                         : <PanelTopClose className="w-4 h-4 lg:w-6 lg:h-6" animateOnHover />
                     }
                 </button>
-                <DownloadPNG />
+                <DownloadJPG />
             </div>
             {/* Menus : toujours en colonne sur mobile (portrait ET paysage), ligne uniquement desktop */}
             <div className="flex flex-col lg:flex-row">

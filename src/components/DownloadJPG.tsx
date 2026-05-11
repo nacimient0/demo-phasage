@@ -10,7 +10,7 @@ import { installationViews } from "@/data/phases";
  * Composant bouton de téléchargement PNG
  * Télécharge l'image de fond actuellement affichée
  */
-export function DownloadPNG() {
+export function DownloadJPG() {
     const { currentPhase: planningPhase } = useStepper();
     const { currentPhase: phasagePhase } = usePhasageNav();
     const { mode, installationIndex, currentFrame } = useNavigationMode();
@@ -42,41 +42,51 @@ export function DownloadPNG() {
                 return;
             }
 
-            // Récupérer l'image
-            const response = await fetch(imageSrc);
+            // Charger l'image dans un objet Image
+            const img = new window.Image();
+            img.crossOrigin = "anonymous";
+            img.src = imageSrc;
 
-            // Ajouter la vérification du statut HTTP
-            if (!response.ok) {
-                throw new Error(`Erreur réseau: ${response.status} - L'image n'a pas pu être trouvée à l'adresse URL: ${imageSrc}`);
-            }
+            img.onload = async () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    alert("Impossible de créer le contexte du canvas");
+                    return;
+                }
+                ctx.drawImage(img, 0, 0);
 
-            const blob = await response.blob();
+                // Exporter en JPG
+                canvas.toBlob(
+                    (blob) => {
+                        if (!blob) {
+                            alert("Erreur lors de la conversion en JPG");
+                            return;
+                        }
 
-            // Créer un nom de fichier avec date (YYYYMMDD_HHMMSS)
-            const now = new Date();
-            const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-            const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
+                        // Créer un nom de fichier avec date (YYYYMMDD_HHMMSS)
+                        const now = new Date();
+                        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+                        const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
+                        const randomId = Math.random().toString(36).substring(2, 8);
+                        const filename = `${dateStr}_${timeStr}_${randomId}.jpg`;
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = filename;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                    },
+                    "image/jpeg",
+                    0.92 // qualité JPG
+                );
+            };
 
-            // Nom basé sur le mode et l'élément actuel
-            let filename = `demo-phasage_${mode}_`;
-            if (mode === "planning") {
-                filename += `phase${planningPhase?.id}_frame${currentFrame}`;
-            } else if (mode === "phasage") {
-                filename += `phase${phasagePhase?.id}_frame${currentFrame}`;
-            } else if (mode === "installation") {
-                filename += `installation${installationIndex + 1}`;
-            }
-            filename += `_${dateStr}_${timeStr}.webp`;
-
-            // Créer un lien de téléchargement
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = filename;
-            link.click();
-
-            // Nettoyer
-            URL.revokeObjectURL(url);
+            img.onerror = () => {
+                alert("Erreur lors du chargement de l'image");
+            };
         } catch (error) {
             console.error("Erreur lors du téléchargement:", error);
             alert("Erreur lors du téléchargement de l'image");

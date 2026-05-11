@@ -14,7 +14,7 @@ interface ViewpointButtonProps {
 }
 
 const VIEWPOINTS_DEFAULT = [
-    "Vue rues  ARAGO - Paul LAFARGE"
+    "Vue Boulevard Pierre Gaudin"
 ]
 
 function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {

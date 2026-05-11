@@ -66,21 +66,6 @@ export function StepperProvider({ children }: { children: ReactNode }) {
         stepper.navigation.goTo(`step-${pointId}`)
     }, [stepper.navigation])
 
-    // Auto-play : boucle infinie point par point
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>
-        if (isPlaying) {
-            interval = setInterval(() => {
-                if (!stepper.state.isLast) {
-                    stepper.navigation.next()
-                } else {
-                    stepper.navigation.goTo("step-1")
-                }
-            }, 800)
-        }
-        return () => clearInterval(interval)
-    }, [isPlaying, stepper.state.isLast, stepper.navigation])
-
     return (
         <StepperContext.Provider
             value={{

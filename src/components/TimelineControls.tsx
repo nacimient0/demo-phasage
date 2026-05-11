@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useStepper } from "@/contexts/StepperContext"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { usePhasageNav, useInstallationNav } from "@/hooks/useNavigationNav"
@@ -43,33 +43,55 @@ export function TimelinePreviousButton() {
 }
 
 export function TimelineControls() {
-    const { isPlaying, setIsPlaying } = useStepper()
-    const { mode } = useNavigationMode()
+    const { isPlaying, setIsPlaying, stepper } = useStepper()
+    const { mode, setPhaseIndex } = useNavigationMode()
     const { phaseIndex, canNext } = usePhasageNav()
-    const { setPhaseIndex } = useNavigationMode()    // Autoplay phasage avec boucle
-    useEffect(() => {
-        if (!isPlaying || mode !== "phasage") return
-        const interval = setInterval(() => {
-            if (canNext) {
-                setPhaseIndex(Math.min(phases.length - 1, phaseIndex + 1))
-            } else {
-                setPhaseIndex(0)
-            }
-        }, 1200)
-        return () => clearInterval(interval)
-    }, [isPlaying, mode, phaseIndex, canNext, setPhaseIndex])
 
-    return (<div className="flex items-center justify-center">
-        <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="size-9 lg:size-12 rounded-full bg-white/80 backdrop-blur-sm border border-border shadow-md hover:bg-white/90 hover:shadow-lg transition-all flex items-center justify-center cursor-pointer"
-        >
-            {isPlaying
-                ? <Pause animateOnHover size={20} fill='black' className='lg:w-6 w-4' />
-                : <Play animateOnHover size={20} fill='black' className='lg:w-6 w-4' />
+    const savedCallback = useRef<() => void>(() => { })
+    useEffect(() => {
+        savedCallback.current = () => {
+            if (mode === "phasage") {
+                if (canNext) {
+                    setPhaseIndex(Math.min(phases.length - 1, phaseIndex + 1))
+                } else {
+                    setPhaseIndex(0)
+                }
+            } else if (mode === "planning") {
+                if (!stepper.state.isLast) {
+                    stepper.navigation.next()
+                } else {
+                    stepper.navigation.goTo("step-1")
+                }
             }
-        </button>
-    </div>
+        }
+    }, [mode, canNext, phaseIndex, setPhaseIndex, stepper])
+
+    useEffect(() => {
+        if (!isPlaying || (mode !== "phasage" && mode !== "planning")) return
+
+        const intervalDuration = mode === "phasage" ? 1200 : 400
+
+        const interval = setInterval(() => {
+            if (savedCallback.current) {
+                savedCallback.current()
+            }
+        }, intervalDuration)
+
+        return () => clearInterval(interval)
+    }, [isPlaying, mode])
+
+    return (
+        <div className="flex items-center justify-center">
+            <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="size-9 lg:size-12 rounded-full bg-white/80 backdrop-blur-sm border border-border shadow-md hover:bg-white/90 hover:shadow-lg transition-all flex items-center justify-center cursor-pointer"
+            >
+                {isPlaying
+                    ? <Pause animateOnHover size={20} fill='black' className='lg:w-6 w-4' />
+                    : <Play animateOnHover size={20} fill='black' className='lg:w-6 w-4' />
+                }
+            </button>
+        </div>
     )
 }
 
