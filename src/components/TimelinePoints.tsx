@@ -8,17 +8,38 @@ import { totalPoints, phases, installationViews } from "@/data/phases"
 export function PhaseIndicator() {
     const { currentPhase } = useStepper()
     if (!currentPhase) return null
+
+    const intervals = totalPoints - 1
+    const kStart = currentPhase.startPoint - 1
+    const isLastPhase = currentPhase.endPoint === totalPoints
+    const endPointForCalc = isLastPhase ? totalPoints : currentPhase.endPoint + 1
+    const span = endPointForCalc - currentPhase.startPoint
+
     return (
-        <div
-            className="absolute -top-7 lg:-top-10 px-2 lg:px-4 py-0.5 lg:py-1.5 rounded-full text-[9px] lg:text-xs font-semibold text-white shadow-lg transition-all duration-300 whitespace-nowrap"
-            style={{
-                backgroundColor: currentPhase.color,
-                insetInlineStart: `${((currentPhase.startPoint - 1) / totalPoints) * 100}%`,
-                insetInlineEnd: `${((totalPoints - currentPhase.endPoint) / totalPoints) * 100}%`,
-            }}
-        >
-            <div className="text-center">{currentPhase.name}</div>
-        </div>
+        <>
+            <style>{`
+                .phase-indicator-vars { --dot-width: 1.25rem; }
+                @media (min-width: 1024px) { .phase-indicator-vars { --dot-width: 1.75rem; } }
+            `}</style>
+            <div
+                className="phase-indicator-vars absolute bottom-[calc(100%+0.5rem)] lg:bottom-[calc(100%+1rem)] px-2 lg:px-0 py-1 lg:py-1.5 rounded-3xl lg:rounded-full text-[9px] lg:text-[11px] font-semibold text-white shadow-lg transition-all duration-300 z-10 flex items-center justify-center"
+                style={{
+                    backgroundColor: currentPhase.color,
+                    left: `calc(${(kStart / intervals) * 100}% - ${(kStart / intervals)} * var(--dot-width))`,
+                    width: isLastPhase
+                        ? `calc(${(span / intervals) * 100}% + ${(1 - span / intervals)} * var(--dot-width))`
+                        : `calc(${(span / intervals) * 100}% - ${(span / intervals)} * var(--dot-width))`
+                }}
+            >
+                <div className="text-center leading-[1.2]">
+                    {currentPhase.name.split(' : ').map((part, i, arr) => (
+                        <span key={i} className="block">
+                            {part}{i === 0 && arr.length > 1 ? " :" : ""}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        </>
     )
 }
 
@@ -34,35 +55,50 @@ export function TimelinePoints() {
                 {phases.map((phase, index) => {
                     const isCurrentPhase = index === phaseIndex
                     const isCompleted = index < phaseIndex
+                    const isHovered = hoveredPointId ? (hoveredPointId >= phase.startPoint && hoveredPointId <= phase.endPoint) : false
+                    
+                    const isVisibleOnMobile = isCurrentPhase || isHovered
+                    const isVisibleOnDesktop = isCurrentPhase || isCompleted || isHovered
 
                     return (
                         <div key={phase.id} className="relative flex flex-col items-center group">
-                            {/* Nom de la phase au-dessus : toujours visible en desktop, uniquement phase active en mobile */}
+                            {/* Nom de la phase au-dessus */}
                             <div
                                 className={cn(
-                                    "absolute -top-6.5 lg:-top-8 px-2 lg:px-3 py-0.5 lg:py-1 rounded-full font-semibold text-white shadow-lg whitespace-nowrap",
-                                    isCurrentPhase ? "text-[10px] lg:text-sm" : "hidden lg:block text-[9px] opacity-75 lg:text-xs"
+                                    "absolute bottom-[calc(100%+0.5rem)] lg:bottom-[calc(100%+0.75rem)] px-2 lg:px-3 py-1 lg:py-1.5 rounded-3xl lg:rounded-full font-semibold text-white shadow-lg transition-all duration-300",
+                                    isVisibleOnMobile ? "opacity-100" : "opacity-0 pointer-events-none",
+                                    isVisibleOnDesktop ? "lg:opacity-100 lg:pointer-events-auto" : "lg:opacity-0 lg:pointer-events-none",
+                                    "text-[9px] lg:text-[11px]",
+                                    isCurrentPhase ? "z-10" : "z-0"
                                 )}
                                 style={{ backgroundColor: phase.color }}
                             >
-                                {phase.name}
+                                <div className="text-center leading-[1.2]">
+                                    {phase.name.split(' : ').map((part, i, arr) => (
+                                        <span key={i} className="block whitespace-nowrap">
+                                            {part}{i === 0 && arr.length > 1 ? " :" : ""}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                             <button
                                 onClick={() => goToPhase(index)}
+                                onMouseEnter={() => setHoveredPointId(phase.startPoint)}
+                                onMouseLeave={() => setHoveredPointId(null)}
                                 className="relative z-10 transition-all duration-300 cursor-pointer focus:outline-none"
                             >
                                 <Badge
                                     className={cn(
                                         "size-6 lg:size-8 rounded-full flex items-center justify-center font-bold text-[10px] transition-all border",
-                                        isCurrentPhase ? "scale-110 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
+                                        isCurrentPhase || isHovered ? "scale-110 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
                                     )}
                                     style={{
-                                        backgroundColor: isCompleted || isCurrentPhase ? phase.color : "var(--muted)",
-                                        color: isCompleted || isCurrentPhase ? "white" : "var(--muted-foreground)",
-                                        borderColor: isCompleted || isCurrentPhase ? phase.color : "var(--border)",
+                                        backgroundColor: isCompleted || isCurrentPhase || isHovered ? phase.color : "white",
+                                        color: isCompleted || isCurrentPhase || isHovered ? "white" : "var(--muted-foreground)",
+                                        borderColor: isCompleted || isCurrentPhase || isHovered ? phase.color : "var(--border)",
                                     }}
                                 >
-                                    {phase.id}
+                                    {index + 1}
                                 </Badge>
                             </button>
                         </div>
@@ -80,6 +116,7 @@ export function TimelinePoints() {
                 const isCurrentPoint = pointId === currentPointId
                 const isCompleted = index < stepper.state.current.index
                 const isInCurrentPhase = hoveredPhase && currentPhase && hoveredPhase.id === currentPhase.id
+                const isHovered = pointId === hoveredPointId
 
                 return (
                     <div
@@ -93,7 +130,7 @@ export function TimelinePoints() {
                                 {step.label}
                             </div>
                         )}
-                        {hoveredPointId === pointId && hoveredPhase && !isInCurrentPhase && (
+                        {isHovered && hoveredPhase && !isInCurrentPhase && (
                             <div
                                 className="hidden lg:block absolute -bottom-9 px-3 py-1 rounded-full text-[10px] font-semibold text-white shadow-lg whitespace-nowrap z-30 pointer-events-none"
                                 style={{ backgroundColor: hoveredPhase.color }}
@@ -108,12 +145,12 @@ export function TimelinePoints() {
                             <Badge
                                 className={cn(
                                     "size-5 lg:size-7 rounded-full flex items-center justify-center font-bold text-[10px] transition-all border",
-                                    isCurrentPoint ? "scale-125 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
+                                    isCurrentPoint || isHovered ? "scale-125 ring-2 ring-primary/30 shadow-xl" : "hover:scale-110 hover:shadow-lg"
                                 )}
                                 style={{
-                                    backgroundColor: isCompleted || isCurrentPoint ? step.color : "var(--muted)",
-                                    color: isCompleted || isCurrentPoint ? "white" : "var(--muted-foreground)",
-                                    borderColor: isCompleted || isCurrentPoint ? step.color : "var(--border)",
+                                    backgroundColor: isCompleted || isCurrentPoint || isHovered ? step.color : "white",
+                                    color: isCompleted || isCurrentPoint || isHovered ? "white" : "var(--muted-foreground)",
+                                    borderColor: isCompleted || isCurrentPoint || isHovered ? step.color : "var(--border)",
                                 }}
                             >
                                 {pointId}

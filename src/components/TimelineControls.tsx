@@ -69,7 +69,7 @@ export function TimelineControls() {
     useEffect(() => {
         if (!isPlaying || (mode !== "phasage" && mode !== "planning")) return
 
-        const intervalDuration = mode === "phasage" ? 1200 : 400
+        const intervalDuration = mode === "phasage" ? 2000 : 1000
 
         const interval = setInterval(() => {
             if (savedCallback.current) {
