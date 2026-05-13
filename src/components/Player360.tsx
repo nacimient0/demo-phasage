@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useContext } from "react"
 import { cn } from "@/lib/utils"
 import { NavigationModeContext } from "@/contexts/NavigationModeContext"
+import { usePreloader } from "@/contexts/PreloaderContext"
 
 interface Player360Props {
     folder: string
@@ -11,8 +12,10 @@ interface Player360Props {
 
 export function Player360({ folder, prefix, frameCount = 90, className }: Player360Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const [images, setImages] = useState<HTMLImageElement[]>([])
     const { currentFrame, setCurrentFrame } = useContext(NavigationModeContext)!
+    const { getImages } = usePreloader()
+
+    const images = getImages(folder, prefix)
 
     // Variables d'état pour le drag/pan/zoom
     const [isDragging, setIsDragging] = useState(false)
@@ -36,27 +39,6 @@ export function Player360({ folder, prefix, frameCount = 90, className }: Player
         setPanX(Math.min(Math.max(px, -maxPanX), maxPanX))
         setPanY(Math.min(Math.max(py, -maxPanY), maxPanY))
     }
-
-    // 1. Préchargement des images
-    useEffect(() => {
-        const loadedImages: HTMLImageElement[] = []
-        let loadedCount = 0
-
-        for (let i = 0; i < frameCount; i++) {
-            const img = new Image()
-            const indexStr = i.toString().padStart(4, "0") // ex: 0000, 0001
-            const baseUrl = import.meta.env.BASE_URL
-            img.src = `${baseUrl}phases/${folder}/${prefix}${indexStr}.webp`
-
-            img.onload = () => {
-                loadedCount++
-                if (loadedCount === frameCount) {
-                    setImages(loadedImages)
-                }
-            }
-            loadedImages.push(img)
-        }
-    }, [folder, prefix, frameCount])
 
     // 2. Dessin sur Canvas
     useEffect(() => {

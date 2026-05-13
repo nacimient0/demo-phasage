@@ -131,7 +131,7 @@ export function TimelinePoints() {
                 const pointId = step.pointId
                 const isCurrentPoint = pointId === currentPointId
                 const isCompleted = index < stepper.state.current.index
-                const isInCurrentPhase = hoveredPhase && currentPhase && hoveredPhase.id === currentPhase.id
+                // const isInCurrentPhase = hoveredPhase && currentPhase && hoveredPhase.id === currentPhase.id
                 const isHovered = pointId === hoveredPointId
 
                 return (

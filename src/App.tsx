@@ -9,6 +9,7 @@ import { Credits } from "@/components/Credits";
 import { PortraitBlocker } from "@/components/PortraitBlocker";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { PreloaderProvider } from "./contexts/PreloaderContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Connected from "./components/Connected";
 
@@ -33,14 +34,16 @@ function AppContent({ showConnected = false }: { showConnected?: boolean }) {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<AppContent />} />
-          <Route path="/eria" element={<AppContent />} />
-          <Route path="/eria/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
-          <Route path="/eria/login" element={<Login />} />
-        </Routes>
-      </Router>
+      <PreloaderProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/eria" element={<AppContent />} />
+            <Route path="/eria/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
+            <Route path="/eria/login" element={<Login />} />
+          </Routes>
+        </Router>
+      </PreloaderProvider>
     </AuthProvider>
   );
 }
