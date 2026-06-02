@@ -59,7 +59,13 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
 
         // 2. Chargement en arrière-plan du reste des assets
         const loadBackground = () => {
-            // Toutes les autres phases
+            // Images d'installation en PREMIER (priorité après Phase_00)
+            installationViews.forEach(view => {
+                const img1 = new Image(); img1.src = `${baseUrl}${view.image}`
+                const img2 = new Image(); img2.src = `${baseUrl}${view.minimap}`
+            })
+
+            // Puis toutes les autres phases
             phases.slice(1).forEach((phase, index) => {
                 const actualIndex = index + 1
                 const folder = `Phase_${String(actualIndex).padStart(2, "0")}`
@@ -90,12 +96,6 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                     img.onerror = handleLoad
                     phaseImages.push(img)
                 }
-            })
-
-            // Images d'installation fixes (simplement mises en cache navigateur)
-            installationViews.forEach(view => {
-                const img1 = new Image(); img1.src = `${baseUrl}${view.image}`
-                const img2 = new Image(); img2.src = `${baseUrl}${view.minimap}`
             })
         }
 
