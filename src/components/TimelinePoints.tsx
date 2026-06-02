@@ -45,12 +45,25 @@ export function PhaseIndicator() {
                                 : `calc(${(span / intervals) * 100}% - ${(span / intervals)} * var(--dot-width))`
                         }}
                     >
-                        <div className="text-center leading-[1.2]">
-                            {phase.name.split(' : ').map((part, i, arr) => (
-                                <span key={i} className={cn("block whitespace-nowrap", i === 0 ? "text-[6px] lg:text-[10px] font-medium opacity-90" : "text-[8px] lg:text-[12px] font-bold")}>
-                                    {part}{i === 0 && arr.length > 1 ? " :" : ""}
-                                </span>
-                            ))}
+                        <div className="text-center leading-[1.2] lg:w-full px-1 lg:px-2 lg:overflow-hidden">
+                            {phase.name.split(' : ').map((part, i, arr) => {
+                                const isFirst = i === 0
+                                const isLast = i === arr.length - 1
+                                const text = part + (isFirst && !isLast ? " :" : "")
+
+                                return (
+                                    <span
+                                        key={i}
+                                        title={text}
+                                        className={cn(
+                                            "block whitespace-nowrap lg:truncate lg:w-full",
+                                            isFirst ? "text-[6px] lg:text-[10px] font-medium opacity-90" : "text-[6px] lg:text-[12px] font-bold"
+                                        )}
+                                    >
+                                        {text}
+                                    </span>
+                                )
+                            })}
                         </div>
                     </div>
                 )

@@ -34,14 +34,14 @@ export function PhaseTimeline() {
     return (
         <>
             {/* ── DESKTOP ── */}
-            <div className="hidden lg:absolute lg:flex lg:bottom-8 left-0 right-0">
-                <div className="flex mx-auto">
-                    <div className="flex relative border rounded-full border-white w-fit px-6 gap-10 bg-white/30 backdrop-blur-none">
+            <div className="hidden lg:absolute lg:flex lg:bottom-8 left-0 right-0 px-4 2xl:px-0">
+                <div className="flex mx-auto w-full justify-center pt-10 2xl:w-auto">
+                    <div className="flex relative border rounded-full border-white w-full 2xl:w-fit px-6 gap-10 bg-white/30 backdrop-blur-none">
                         <TimelineControls />
                         <TimelinePreviousButton />
-                        <div className="relative flex py-6 w-full h-18">
+                        <div className="relative flex py-6 flex-1 min-w-0 2xl:flex-none h-18">
                             <ProgressBar />
-                            <div className={`relative flex items-center w-full ${mode === "phasage" ? "justify-between gap-30" : "justify-between gap-6"}`}>
+                            <div className={`relative flex items-center w-full ${mode === "phasage" ? "justify-between 2xl:gap-30" : "justify-between 2xl:gap-6"}`}>
                                 {mode === "planning" && <PhaseIndicator />}
                                 <TimelinePoints />
                             </div>

@@ -88,13 +88,15 @@ export function MassPlan() {
 
                     {isInstallation ? (
                         installationViews.map((view, index) => (
-                            <VisionCone
-                                key={view.id}
-                                bottom={view.conePosition.bottom || ""}
-                                left={view.conePosition.left || ""}
-                                rotate={view.conePosition.rotate || ""}
-                                active={index === installationIndex}
-                            />
+                            view.conePosition && (
+                                <VisionCone
+                                    key={view.id}
+                                    bottom={view.conePosition.bottom || ""}
+                                    left={view.conePosition.left || ""}
+                                    rotate={view.conePosition.rotate || ""}
+                                    active={index === installationIndex}
+                                />
+                            )
                         ))
                     ) : (
                         <div

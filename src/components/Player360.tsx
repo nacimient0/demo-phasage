@@ -13,9 +13,11 @@ interface Player360Props {
 export function Player360({ folder, prefix, frameCount = 90, className }: Player360Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const { currentFrame, setCurrentFrame } = useContext(NavigationModeContext)!
-    const { getImages } = usePreloader()
+    const { getImages, getPhaseStatus } = usePreloader()
 
     const images = getImages(folder, prefix)
+    const status = getPhaseStatus(folder)
+    const isLoading = images.length === 0 || !status.isComplete
 
     // Variables d'état pour le drag/pan/zoom
     const [isDragging, setIsDragging] = useState(false)
@@ -184,6 +186,18 @@ export function Player360({ folder, prefix, frameCount = 90, className }: Player
                     transition: isDragging ? "none" : "transform 0.1s ease-out"
                 }}
             />
+
+            {isLoading && (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-none">
+                    <div className="size-10 border-[1.5px] border-white/20 border-t-white rounded-full animate-spin mb-3" />
+                    <div className="text-white font-medium text-[10px] tracking-wider uppercase mb-1">
+                        Chargement
+                    </div>
+                    <div className="text-white/60 text-[9px]">
+                        {Math.round((status.loaded / status.total) * 100) || 0}%
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

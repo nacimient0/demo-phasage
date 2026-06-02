@@ -5,7 +5,7 @@ export interface InstallationView {
     label: string        // Nom affiché dans MenuViewPoint
     image: string        // Chemin relatif au dossier public
     minimap: string      // Chemin relatif au dossier public de la minimap associée
-    conePosition: {      // Position du cône sur le plan de masse
+    conePosition?: {     // Position du cône sur le plan de masse (Optionnel)
         bottom: string
         left?: string
         rotate: string
@@ -18,28 +18,27 @@ export const installationViews: InstallationView[] = [
         label: "Vue Base vie et zones de déchargement - Rue Bellini",
         image: "installation/VUE_PIC_001.webp",
         minimap: "minimaps/phase02.webp",
-        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
+        conePosition: { bottom: "10%", left: "43%", rotate: "rotate-[-90deg]" },
     },
     {
         id: 2,
         label: "Vue Base vie et zones de déchargement - Bd Pierre Gaudin",
         image: "installation/VUE_PIC_002.webp",
         minimap: "minimaps/phase05.webp",
-        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
+        conePosition: { bottom: "35%", left: "75%", rotate: "rotate-[200deg]" },
     },
     {
         id: 3,
         label: "Vue Base vie et zones de déchargement - Passerelle de l'Orme",
         image: "installation/VUE_PIC_003.webp",
         minimap: "minimaps/phase06.webp",
-        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
+        conePosition: { bottom: "5%", left: "70%", rotate: "rotate-[-145deg]" },
     },
     {
         id: 4,
         label: "Vue Périmètre chantier et Rayon Grue - Vue de dessus",
-        image: "installation/VUE_PIC_004.webp",
-        minimap: "minimaps/phase06.webp",
-        conePosition: { bottom: "20%", left: "70%", rotate: "rotate-[200deg]" },
+        image: "installation/General.webp",
+        minimap: "minimaps/phase05.webp",
     },
 ]
 
