@@ -12,7 +12,7 @@ const PreloaderContext = createContext<PreloaderContextType | undefined>(undefin
 export function PreloaderProvider({ children }: { children: ReactNode }) {
     const [isAppReady, setIsAppReady] = useState(false)
     const [appProgress, setAppProgress] = useState(0)
-    
+
     // Suivi de la progression individuelle des phases (pour le chargement en arrière-plan)
     const [phaseProgress, setPhaseProgress] = useState<Record<string, { loaded: number; total: number; isComplete: boolean }>>({})
     const [imagesCache, setImagesCache] = useState<Record<string, HTMLImageElement[]>>({})
@@ -33,15 +33,15 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                 const img = new Image()
                 const indexStr = i.toString().padStart(4, "0")
                 img.src = `${baseUrl}phases/${folder}/${prefix}${indexStr}.webp`
-                
+
                 const handleLoad = () => {
                     loadedCount++
                     setAppProgress(Math.round((loadedCount / totalPriority) * 100))
-                    
+
                     if (loadedCount === totalPriority) {
                         setImagesCache(prev => ({ ...prev, [`${folder}_${prefix}`]: phaseImages }))
                         setPhaseProgress(prev => ({ ...prev, [folder]: { loaded: frameCount, total: frameCount, isComplete: true } }))
-                        
+
                         // L'UI est prête
                         setTimeout(() => {
                             setIsAppReady(true)
@@ -50,7 +50,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                         }, 300)
                     }
                 }
-                
+
                 img.onload = handleLoad
                 img.onerror = handleLoad // On continue même s'il y a une erreur
                 phaseImages.push(img)
@@ -71,7 +71,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                 const folder = `Phase_${String(actualIndex).padStart(2, "0")}`
                 const prefix = "Phasage"
                 const phaseImages: HTMLImageElement[] = []
-                
+
                 let loadedCount = 0
                 setPhaseProgress(prev => ({ ...prev, [folder]: { loaded: 0, total: frameCount, isComplete: false } }))
 
@@ -79,19 +79,19 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                     const img = new Image()
                     const indexStr = i.toString().padStart(4, "0")
                     img.src = `${baseUrl}phases/${folder}/${prefix}${indexStr}.webp`
-                    
+
                     const handleLoad = () => {
                         loadedCount++
-                        setPhaseProgress(prev => ({ 
-                            ...prev, 
-                            [folder]: { loaded: loadedCount, total: frameCount, isComplete: loadedCount === frameCount } 
+                        setPhaseProgress(prev => ({
+                            ...prev,
+                            [folder]: { loaded: loadedCount, total: frameCount, isComplete: loadedCount === frameCount }
                         }))
-                        
+
                         if (loadedCount === frameCount) {
                             setImagesCache(prev => ({ ...prev, [`${folder}_${prefix}`]: phaseImages }))
                         }
                     }
-                    
+
                     img.onload = handleLoad
                     img.onerror = handleLoad
                     phaseImages.push(img)
@@ -105,7 +105,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
     const getImages = (folder: string, prefix: string) => {
         return imagesCache[`${folder}_${prefix}`] || []
     }
-    
+
     const getPhaseStatus = (folder: string) => {
         return phaseProgress[folder] || { loaded: 0, total: 90, isComplete: false }
     }
@@ -115,30 +115,30 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
             {!isAppReady && (
                 <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-auto overflow-hidden bg-[#1a1a1a]">
                     {/* Image de fond avec blur important (utilise la première image d'installation comme cover) */}
-                    <div 
+                    <div
                         className="absolute inset-0 bg-cover bg-center transform scale-110"
-                        style={{ 
+                        style={{
                             backgroundImage: `url(${import.meta.env.BASE_URL}${installationViews[0]?.image || ''})`,
                             filter: 'blur(24px)'
                         }}
                     ></div>
-                    
+
                     {/* Overlay d'assombrissement pour garantir le contraste */}
                     <div className="absolute inset-0 bg-black/50"></div>
-                    
+
                     {/* Contenu du Preloader */}
                     <div className="relative z-10 flex flex-col items-center w-full max-w-sm px-8">
-                        
+
                         <div className="text-3xl md:text-4xl font-light text-white tracking-[0.2em] mb-2 text-center uppercase">
-                            ERIA
+                            HAROPA PORT DU HAVRE
                         </div>
                         <h2 className="text-xs md:text-sm font-medium text-white/70 tracking-[0.1em] mb-12 text-center uppercase">
                             Chargement de la maquette
                         </h2>
-                        
+
                         {/* Progress Bar très fine */}
                         <div className="w-full h-[2px] bg-white/20 overflow-hidden mb-3">
-                            <div 
+                            <div
                                 className="h-full bg-white transition-all duration-300 ease-out"
                                 style={{ width: `${appProgress}%` }}
                             />
@@ -152,7 +152,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
                     </div>
                 </div>
             )}
-            
+
             {/* Rendu conditionnel des enfants : 
                 On empêche le rendu de l'AppContent tant que ce n'est pas chargé
                 pour éviter que les hooks dépendent de données pas prêtes. */}

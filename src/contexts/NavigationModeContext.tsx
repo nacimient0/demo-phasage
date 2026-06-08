@@ -22,7 +22,7 @@ export const NavigationModeContext = createContext<NavigationModeContextType | n
 
 export function NavigationModeProvider({ children }: { children: ReactNode }) {
     const [mode, setMode] = useState<NavigationMode>(
-        () => (localStorage.getItem("projectMode") as NavigationMode) ?? "planning"
+        () => (localStorage.getItem("projectMode") as NavigationMode) ?? "installation"
     )
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [installationIndex, setInstallationIndex] = useState(0)

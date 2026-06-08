@@ -147,6 +147,11 @@ export function TimelinePoints() {
                 // const isInCurrentPhase = hoveredPhase && currentPhase && hoveredPhase.id === currentPhase.id
                 const isHovered = pointId === hoveredPointId
 
+                function convertPointIdtoLetter(id: number) {
+                    if (id <= 26) return String.fromCharCode(64 + id)
+                    else return String.fromCharCode(64 + (id % 26)) + (id > 26 ? String.fromCharCode(64 + (id % 26)) : "")
+                }
+
                 return (
                     <div
                         key={pointId}
@@ -182,7 +187,7 @@ export function TimelinePoints() {
                                     borderColor: isCompleted || isCurrentPoint || isHovered ? step.color : "var(--border)",
                                 }}
                             >
-                                {pointId}
+                                {convertPointIdtoLetter(pointId)}
                             </Badge>
                         </button>
                     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play } from "@/components/animate-ui/icons/play"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { useInstallationNav, usePhasageNav } from "@/hooks/useNavigationNav"
@@ -33,9 +33,10 @@ function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: 
 export function MassPlan() {
     const [display, setDisplay] = useState(true);
     const { mode, currentFrame } = useNavigationMode()
-    const { installationIndex } = useInstallationNav()
+    const { installationIndex, goTo: goToInstallation } = useInstallationNav()
     const { currentPhase: phasagePhase } = usePhasageNav()
     const { currentPhase: planningPhase } = useStepper()
+    const [imageError, setImageError] = useState(false)
 
     const isInstallation = mode === "installation"
 
@@ -49,6 +50,10 @@ export function MassPlan() {
     const minimapSrc = isInstallation
         ? `${import.meta.env.BASE_URL}${installationViews[installationIndex].minimap}`
         : `${import.meta.env.BASE_URL}minimaps/phase0${phaseId}.webp`
+
+    useEffect(() => {
+        setImageError(false)
+    }, [minimapSrc])
 
     // Calcul de la rotation en fonction de la frame (max 90 frames = 360 deg)
     const rotationRatio = -(currentFrame / 90) * 360;
@@ -72,32 +77,34 @@ export function MassPlan() {
                 className="absolute top-2 right-2 z-20 cursor-pointer shadow-2xl bg-white"
                 title={display ? "Replier le plan de masse" : "Déplier le plan de masse"}
             >
-                {display
-                    ? <Play onClick={() => setDisplay(false)} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 lg:rotate-90" />
-                    : <Play onClick={() => setDisplay(true)} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 rotate-180 lg:rotate-270" />
-                }
             </div>
 
             {display && (
-                <div className="flex relative overflow-hidden border border-white shadow-2xl">
+                <div className="flex relative overflow-hidden border border-white shadow-2xl bg-black/10 transition-transform duration-300 origin-top-right active:scale-250 cursor-zoom-in">
                     <img
-                        src={minimapSrc}
+                        src={imageError ? `${import.meta.env.BASE_URL}minimaps/phase00.webp` : minimapSrc}
+                        onError={() => setImageError(true)}
                         alt="Mass Plan"
                         className="w-full h-auto shadow-lg object-cover pointer-events-none"
                     />
 
                     {isInstallation ? (
-                        installationViews.map((view, index) => (
-                            view.conePosition && (
-                                <VisionCone
-                                    key={view.id}
-                                    bottom={view.conePosition.bottom || ""}
-                                    left={view.conePosition.left || ""}
-                                    rotate={view.conePosition.rotate || ""}
-                                    active={index === installationIndex}
-                                />
-                            )
-                        ))
+                        <>
+                            {(() => {
+                                const activeView = installationViews[installationIndex]
+                                if (!activeView || !activeView.conePosition) return null
+                                return (
+                                    <>
+                                        <VisionCone
+                                            bottom={activeView.conePosition.bottom || ""}
+                                            left={activeView.conePosition.left || ""}
+                                            rotate={activeView.conePosition.rotate || ""}
+                                            active={true}
+                                        />
+                                    </>
+                                )
+                            })()}
+                        </>
                     ) : (
                         <div
                             className="absolute pointer-events-none"

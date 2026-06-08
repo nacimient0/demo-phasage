@@ -38,9 +38,9 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<AppContent />} />
-            <Route path="/eria" element={<AppContent />} />
-            <Route path="/eria/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
-            <Route path="/eria/login" element={<Login />} />
+            <Route path="/haropa" element={<AppContent />} />
+            <Route path="/haropa/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
+            <Route path="/haropa/login" element={<Login />} />
           </Routes>
         </Router>
       </PreloaderProvider>

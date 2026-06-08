@@ -7,13 +7,13 @@ import { Crane } from "./custom-svg/Crane"
 
 const LABEL_TO_MODE: Record<string, NavigationMode> = {
     "Planning chantier": "planning",
-    "Phasage chantier": "phasage",
+    // "Phasage chantier": "phasage",
     "Installation chantier": "installation",
 }
 
 const MODE_TO_LABEL: Record<NavigationMode, string> = {
     planning: "Planning chantier",
-    phasage: "Phasage chantier",
+    // phasage: "Phasage chantier",
     installation: "Installation chantier",
 }
 
@@ -26,7 +26,7 @@ interface ProjectTypeButtonProps {
 
 const ICONS = {
     "Planning chantier": CalendarClock,
-    "Phasage chantier": Crane,
+    // "Phasage chantier": Crane,
     "Installation chantier": TrafficCone
 }
 
@@ -57,7 +57,7 @@ function ProjectTypeButton({ label, onClick, isSelected, isExpanded }: ProjectTy
 
 const PROJECT_TYPES = [
     "Planning chantier",
-    "Phasage chantier",
+    // "Phasage chantier",
     "Installation chantier"
 ]
 
