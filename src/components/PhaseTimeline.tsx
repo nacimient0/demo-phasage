@@ -32,21 +32,21 @@ function InstallationGallery() {
                         goTo(swiper.activeIndex)
                     }}
                     initialSlide={installationIndex}
-                    slidesPerView={3}
                     spaceBetween={8}
-                    centeredSlides={true}
+                    slidesOffsetBefore={8}
+                    slidesOffsetAfter={8}
                     breakpoints={{
                         480: {
-                            slidesPerView: 5,
-                            spaceBetween: 10,
+                            slidesPerView: 6,
+                            spaceBetween: 0,
                         },
                         768: {
                             slidesPerView: 7,
-                            spaceBetween: 12,
+                            spaceBetween: 0,
                         },
                         1024: {
                             slidesPerView: 9,
-                            spaceBetween: 14,
+                            spaceBetween: 0,
                         }
                     }}
                     className="w-full h-full"
@@ -63,8 +63,8 @@ function InstallationGallery() {
                                     className={cn(
                                         "relative flex size-10 lg:size-16 overflow-hidden cursor-pointer focus:outline-none transition-all duration-300",
                                         isActive
-                                            ? "border-2 border-[#E30613] scale-110 shadow-[0_0_10px_rgba(227,6,19,0.6)] z-10"
-                                            : "border border-white/40 opacity-60 hover:opacity-100 hover:scale-105"
+                                            ? "border-2 border-[#E30613] scale-110 z-10"
+                                            : "border border-white/40 opacity-70 hover:opacity-100 hover:scale-105"
                                     )}
                                     title={view.label}
                                 >
@@ -75,9 +75,6 @@ function InstallationGallery() {
                                         loading="lazy"
                                     />
                                     <div className="absolute inset-0 hover:bg-transparent transition-colors duration-200" />
-                                    <div className="absolute inset-0 flex items-center justify-center text-[10px] lg:text-xs text-white font-bold bg-black/30 drop-shadow-md">
-                                        {index + 1}
-                                    </div>
                                 </button>
                             </SwiperSlide>
                         )

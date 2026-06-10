@@ -20,9 +20,9 @@ const VIEWPOINTS_DEFAULT = [
 function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {
     return (
         <button
-            onClick={onClick} className={`text-black inline-flex items-center h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] lg:first:mt-0 ${isSelected
-                ? "bg-white text-black z-10"
-                : "bg-white text-black hover:bg-[#E30613] hover:text-white hover:z-10"
+            onClick={onClick} className={`text-black inline-flex items-center shrink-0 z-100 h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] lg:first:mt-0 ${isSelected
+                ? "bg-white text-black"
+                : "bg-white text-black hover:bg-[#E30613] hover:text-white"
                 }`}
         >
             <Viewpoint className="w-4 h-4 lg:w-6 lg:h-6 shrink-0" />
@@ -49,6 +49,13 @@ export function MenuViewPoint() {
     const [trackedMode, setTrackedMode] = useState(mode)
     const [trackedInstallationIndex, setTrackedInstallationIndex] = useState(installationIndex)
     const containerRef = useRef<HTMLDivElement>(null)
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth)
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
 
     // Fermer quand le mode ou l'index installation change
     if (trackedMode !== mode) {
@@ -96,10 +103,19 @@ export function MenuViewPoint() {
     }
 
     const showChevron = viewpoints.length > 1
+    // mobile < 768px → -110px, tablette/desktop ≥ 768px → -160px
+    const expandedHeight = windowWidth < 768 ? "calc(100dvh - 110px)" : "calc(100dvh - 160px)"
+    // mobile (flex-col) : -mt-px pour fusionner le border-t avec le border-b de "Installation chantier"
+    const expandedClasses = isExpanded
+        ? `overflow-y-auto border-t border-b border-black ${windowWidth < 768 ? "-mt-px" : ""}`
+        : "overflow-visible"
 
     return (
         <div className="flex" ref={containerRef}>
-            <div className="flex relative flex-col w-fit">
+            <div
+                className={`flex relative flex-col w-fit self-start z-100 ${expandedClasses}`}
+                style={isExpanded ? { height: expandedHeight } : undefined}
+            >
                 {[
                     selectedViewpoint,
                     ...viewpoints.filter(v => v !== selectedViewpoint)

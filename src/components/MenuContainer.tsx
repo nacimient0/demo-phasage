@@ -10,7 +10,7 @@ export function MenuContainer() {
     const { timelineVisible, setTimelineVisible } = useNavigationMode()
 
     return (
-        <div className="absolute top-2 left-2 lg:top-5 lg:left-5 z-10 flex">
+        <div className="absolute top-2 left-2 lg:top-5 lg:left-5 z-100 flex">
             {/* Colonne boutons icônes */}
             <div className="flex flex-col mr-1 lg:mr-5">
                 <Fullscreen />
@@ -27,7 +27,7 @@ export function MenuContainer() {
                 <DownloadJPG />
             </div>
             {/* Menus : toujours en colonne sur mobile (portrait ET paysage), ligne uniquement desktop */}
-            <div className="flex flex-col lg:flex-row">
+            <div className="flex flex-col z-100 lg:flex-row">
                 <MenuProjectType />
                 <MenuViewPoint />
             </div>
