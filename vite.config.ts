@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig(({ command }) => ({
   plugins: [react(), tailwindcss()],
-  base: command === 'build' ? '/eria/' : '/',
+  base: command === 'build' ? '/haropa/' : '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -34,6 +34,7 @@ export function NavigationModeProvider({ children }: { children: ReactNode }) {
         setMode(newMode)
         setPhaseIndex(0)
         setInstallationIndex(0)
+        setCurrentFrame(0)
     }
 
     return (

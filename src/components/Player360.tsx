@@ -10,7 +10,7 @@ interface Player360Props {
     className?: string
 }
 
-export function Player360({ folder, prefix, frameCount = 90, className }: Player360Props) {
+export function Player360({ folder, prefix, frameCount = 30, className }: Player360Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const { currentFrame, setCurrentFrame } = useContext(NavigationModeContext)!
     const { getImages, getPhaseStatus } = usePreloader()
@@ -50,7 +50,8 @@ export function Player360({ folder, prefix, frameCount = 90, className }: Player
         const ctx = canvas.getContext("2d")
         if (!ctx) return
 
-        const img = images[currentFrame]
+        const img = images[currentFrame] || images[0]
+        if (!img) return
         canvas.width = window.innerWidth  // Mieux vaut utiliser la taille de la fenêtre ici
         canvas.height = window.innerHeight
 

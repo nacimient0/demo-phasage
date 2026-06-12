@@ -38,6 +38,8 @@ export function MassPlan() {
     const { currentPhase: planningPhase } = useStepper()
     const [imageError, setImageError] = useState(false)
 
+    const [isZoomed, setIsZoomed] = useState(false);
+
     const isInstallation = mode === "installation"
 
     let phaseId = 0;
@@ -55,8 +57,13 @@ export function MassPlan() {
         setImageError(false)
     }, [minimapSrc])
 
-    // Calcul de la rotation en fonction de la frame (max 90 frames = 360 deg)
-    const rotationRatio = -(currentFrame / 90) * 360;
+    // Reset de l'état zoomé lors d'un changement de navigation ou phase
+    useEffect(() => {
+        setIsZoomed(false)
+    }, [mode, phaseId, installationIndex])
+
+    // Calcul de la rotation en fonction de la frame (max 30 frames = 360 deg)
+    const rotationRatio = -(currentFrame / 30) * 360;
     const baseRotation = 270;
     const dynamicRotation = baseRotation + rotationRatio;
 
@@ -70,17 +77,26 @@ export function MassPlan() {
     // Calcul de la position
     const orbitLeft = centerX + (scaleX * Math.cos(angleRad));
     const orbitTop = centerY + (scaleY * Math.sin(angleRad));
-
     return (
         <div className="relative w-fit select-none">
             <div
                 className="absolute top-2 right-2 z-20 cursor-pointer shadow-2xl bg-white"
                 title={display ? "Replier le plan de masse" : "Déplier le plan de masse"}
             >
+                {display
+                    ? <Play onClick={() => { setDisplay(false); setIsZoomed(false); }} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 lg:rotate-90" />
+                    : <Play onClick={() => setDisplay(true)} fill="black" className="w-4 h-4 lg:w-6 lg:h-6 rotate-180 lg:rotate-270" />
+                }
             </div>
 
             {display && (
-                <div className="flex relative overflow-hidden border border-white shadow-2xl bg-black/10 transition-transform duration-300 origin-top-right active:scale-250 cursor-zoom-in">
+                <div
+                    onClick={() => setIsZoomed(!isZoomed)}
+                    className={`flex relative overflow-hidden border border-white shadow-2xl bg-black/10 transition-transform duration-300 origin-top-right ${isZoomed
+                        ? "scale-[3.0] landscape:scale-[2.4] md:scale-[3.5] md:landscape:scale-[3.0] lg:scale-[4.5] xl:scale-[5.5] cursor-zoom-out z-10"
+                        : "scale-100 cursor-zoom-in z-0 w-full"
+                        }`}
+                >
                     <img
                         src={imageError ? `${import.meta.env.BASE_URL}minimaps/phase00.webp` : minimapSrc}
                         onError={() => setImageError(true)}
@@ -136,4 +152,3 @@ export function MassPlan() {
         </div>
     )
 }
-

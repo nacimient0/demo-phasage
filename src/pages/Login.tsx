@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const [form, setForm] = useState({ email: "", password: "", project: "eria" });
+    const [form, setForm] = useState({ email: "", password: "", project: "haropa" });
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const { setToken, token } = useAuth();
@@ -23,7 +23,7 @@ export default function Login() {
             const res = await api.post("/api/login", form);
 
             setToken(res.data.token, res.data.user.id, res.data.user.name);
-            navigate("/eria/secured");
+            navigate("/haropa/secured");
         } catch (err: any) {
             setError(err.response?.data?.message || "Erreur inconnue");
             console.error("Erreur API :", err.response?.data || err.message);

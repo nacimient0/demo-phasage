@@ -8,14 +8,9 @@ import { MenuContainer } from "@/components/MenuContainer";
 import { Credits } from "@/components/Credits";
 import { PortraitBlocker } from "@/components/PortraitBlocker";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
 import { PreloaderProvider } from "./contexts/PreloaderContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Connected from "./components/Connected";
 
-import Login from "./pages/Login";
-
-function AppContent({ showConnected = false }: { showConnected?: boolean }) {
+function AppContent() {
   return (
     <NavigationModeProvider>
       <StepperProvider>
@@ -25,7 +20,6 @@ function AppContent({ showConnected = false }: { showConnected?: boolean }) {
         <PhaseBackground />
         <PhaseTimeline />
         <Credits />
-        {showConnected && <Connected />}
       </StepperProvider>
     </NavigationModeProvider>
   );
@@ -33,18 +27,14 @@ function AppContent({ showConnected = false }: { showConnected?: boolean }) {
 
 function App() {
   return (
-    <AuthProvider>
-      <PreloaderProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<AppContent />} />
-            <Route path="/haropa" element={<AppContent />} />
-            <Route path="/haropa/secured" element={<ProtectedRoute><AppContent showConnected={true} /></ProtectedRoute>} />
-            <Route path="/haropa/login" element={<Login />} />
-          </Routes>
-        </Router>
-      </PreloaderProvider>
-    </AuthProvider>
+    <PreloaderProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<AppContent />} />
+          <Route path="/haropa" element={<AppContent />} />
+        </Routes>
+      </Router>
+    </PreloaderProvider>
   );
 }
 

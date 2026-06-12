@@ -8,7 +8,7 @@ export default function Connected() {
 
     const handleLogout = () => {
         logout();
-        navigate("/eria/login");
+        navigate("/haropa/login");
     };
 
     return (
@@ -26,7 +26,7 @@ export default function Connected() {
                     </span>
                 </button>
             ) : (
-                <Link to="/eria/login" className="hover:text-blue-500 transition cursor-pointer flex items-center gap-2" title="Se connecter">
+                <Link to="/haropa/login" className="hover:text-blue-500 transition cursor-pointer flex items-center gap-2" title="Se connecter">
                     <LogIn className="w-5 h-5" />
                     <span className="text-sm font-semibold hidden md:block">Se connecter</span>
                 </Link>

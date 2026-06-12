@@ -38,7 +38,7 @@ export function PhaseBackground() {
                 <Player360
                     folder={`Phase_${folderId}`}
                     prefix="Phasage"
-                    frameCount={90}
+                    frameCount={30}
                 />
             </div>
         )
@@ -46,14 +46,18 @@ export function PhaseBackground() {
 
     if (mode === "installation") {
         return (
-            <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
+            <div className="fixed inset-0 w-full h-screen select-none bg-black overflow-hidden flex items-center justify-center">
+                {/* Blurred backdrop to fill the screen for non-standard aspect ratios (e.g. square images) */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center filter blur-2xl opacity-40 scale-110 pointer-events-none transition-all duration-500"
+                    style={{ backgroundImage: `url(${imageSrc})` }}
+                />
+
+                {/* Main image rendered in full view without cropping */}
                 <img
                     src={imageSrc}
                     alt={altText}
-                    className={cn(
-                        "w-full h-full object-cover transition-opacity duration-500 pointer-events-none",
-                        mode === "installation" ? "object-bottom" : "object-center"
-                    )}
+                    className="relative z-10 max-w-full max-h-full object-contain transition-opacity duration-500 pointer-events-none"
                 />
             </div>
         )
@@ -66,7 +70,7 @@ export function PhaseBackground() {
                 <Player360
                     folder={`Phase_${folderId}`}
                     prefix="Phasage"
-                    frameCount={90}
+                    frameCount={30}
                 />
             </div>
         )
