@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { phases, installationViews } from "@/data/phases"
+import { phases, installationViews, frameCount } from "@/data/phases"
 
 interface PreloaderContextType {
     isLoaded: boolean
@@ -18,7 +18,6 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
     const [imagesCache, setImagesCache] = useState<Record<string, HTMLImageElement[]>>({})
 
     useEffect(() => {
-        const frameCount = 30
         const baseUrl = import.meta.env.BASE_URL
 
         // 1. Chargement prioritaire de la Phase 00 (pour débloquer l'UI le plus vite possible)
@@ -107,7 +106,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
     }
 
     const getPhaseStatus = (folder: string) => {
-        return phaseProgress[folder] || { loaded: 0, total: 30, isComplete: false }
+        return phaseProgress[folder] || { loaded: 0, total: frameCount, isComplete: false }
     }
 
     return (

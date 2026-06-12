@@ -1,7 +1,7 @@
 import { useStepper } from "@/contexts/StepperContext"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { usePhasageNav, useInstallationNav } from "@/hooks/useNavigationNav"
-import { installationViews } from "@/data/phases"
+import { installationViews, frameCount } from "@/data/phases"
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { Player360 } from "./Player360"
@@ -38,7 +38,7 @@ export function PhaseBackground() {
                 <Player360
                     folder={`Phase_${folderId}`}
                     prefix="Phasage"
-                    frameCount={30}
+                    frameCount={frameCount}
                 />
             </div>
         )
@@ -70,7 +70,7 @@ export function PhaseBackground() {
                 <Player360
                     folder={`Phase_${folderId}`}
                     prefix="Phasage"
-                    frameCount={30}
+                    frameCount={frameCount}
                 />
             </div>
         )

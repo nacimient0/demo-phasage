@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Play } from "@/components/animate-ui/icons/play"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { useInstallationNav, usePhasageNav } from "@/hooks/useNavigationNav"
 import { useStepper } from "@/contexts/StepperContext"
-import { installationViews } from "@/data/phases"
+import { installationViews, frameCount } from "@/data/phases"
 
 function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: string, left: string, active: boolean }) {
     return (
@@ -62,8 +62,21 @@ export function MassPlan() {
         setIsZoomed(false)
     }, [mode, phaseId, installationIndex])
 
-    // Calcul de la rotation en fonction de la frame (max 30 frames = 360 deg)
-    const rotationRatio = -(currentFrame / 30) * 360;
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    // Fermer le zoom au clic à l'extérieur
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (isZoomed && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsZoomed(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [isZoomed])
+
+    // Calcul de la rotation en fonction de la frame (max frameCount frames = 360 deg)
+    const rotationRatio = -(currentFrame / frameCount) * 360;
     const baseRotation = 270;
     const dynamicRotation = baseRotation + rotationRatio;
 
@@ -78,7 +91,7 @@ export function MassPlan() {
     const orbitLeft = centerX + (scaleX * Math.cos(angleRad));
     const orbitTop = centerY + (scaleY * Math.sin(angleRad));
     return (
-        <div className="relative w-fit select-none">
+        <div ref={containerRef} className="relative w-fit select-none">
             <div
                 className="absolute top-2 right-2 z-20 cursor-pointer shadow-2xl bg-white"
                 title={display ? "Replier le plan de masse" : "Déplier le plan de masse"}
@@ -93,7 +106,7 @@ export function MassPlan() {
                 <div
                     onClick={() => setIsZoomed(!isZoomed)}
                     className={`flex relative overflow-hidden border border-white shadow-2xl bg-black/10 transition-transform duration-300 origin-top-right ${isZoomed
-                        ? "scale-[3.0] landscape:scale-[2.4] md:scale-[3.5] md:landscape:scale-[3.0] lg:scale-[4.5] xl:scale-[5.5] cursor-zoom-out z-10"
+                        ? "scale-[1.7] max-md:landscape:scale-[1.6] md:scale-[2.1] md:max-lg:landscape:scale-[2.0] lg:scale-[2.8] xl:scale-[2.8] cursor-zoom-out z-10"
                         : "scale-100 cursor-zoom-in z-0 w-full"
                         }`}
                 >

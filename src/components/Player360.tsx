@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useContext } from "react"
 import { cn } from "@/lib/utils"
 import { NavigationModeContext } from "@/contexts/NavigationModeContext"
 import { usePreloader } from "@/contexts/PreloaderContext"
+import { frameCount as defaultFrameCount } from "@/data/phases"
 
 interface Player360Props {
     folder: string
@@ -10,7 +11,7 @@ interface Player360Props {
     className?: string
 }
 
-export function Player360({ folder, prefix, frameCount = 30, className }: Player360Props) {
+export function Player360({ folder, prefix, frameCount = defaultFrameCount, className }: Player360Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const { currentFrame, setCurrentFrame } = useContext(NavigationModeContext)!
     const { getImages, getPhaseStatus } = usePreloader()

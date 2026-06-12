@@ -21,9 +21,13 @@ export interface NavigationModeContextType {
 export const NavigationModeContext = createContext<NavigationModeContextType | null>(null)
 
 export function NavigationModeProvider({ children }: { children: ReactNode }) {
-    const [mode, setMode] = useState<NavigationMode>(
-        () => (localStorage.getItem("projectMode") as NavigationMode) ?? "installation"
-    )
+    const [mode, setMode] = useState<NavigationMode>(() => {
+        const saved = localStorage.getItem("projectMode") as NavigationMode
+        if (saved === "planning" || saved === "installation") {
+            return saved
+        }
+        return "installation"
+    })
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [installationIndex, setInstallationIndex] = useState(0)
     const [timelineVisible, setTimelineVisible] = useState(true)

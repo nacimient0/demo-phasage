@@ -23,3 +23,4 @@ const data = await response.json();
 export const installationViews: InstallationView[] = data.installationViews;
 export const phases: Phase[] = data.phases;
 export const totalPoints: number = data.totalPoints;
+export const frameCount: number = data.frameCount || 30;
