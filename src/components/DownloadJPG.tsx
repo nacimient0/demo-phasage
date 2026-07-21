@@ -11,9 +11,23 @@ import { installationViews } from "@/data/phases";
  * Télécharge l'image de fond actuellement affichée
  */
 export function DownloadJPG() {
-    const { currentPhase: planningPhase } = useStepper();
+    const { currentPhase: planningPhase, currentPointId } = useStepper();
     const { currentPhase: phasagePhase } = usePhasageNav();
     const { mode, installationIndex, currentFrame } = useNavigationMode();
+
+    // Récupère le champ "360" du point courant en mode planning
+    const planning360 = useMemo(() => {
+        if (!planningPhase) return null;
+        const point = planningPhase.points.find((p) => p.id === currentPointId);
+        return point?.["360"] ?? null;
+    }, [planningPhase, currentPointId]);
+
+    // Récupère le champ "360" du premier point de la phase en mode phasage
+    const phasage360 = useMemo(() => {
+        if (!phasagePhase) return null;
+        const point = phasagePhase.points[0];
+        return point?.["360"] ?? null;
+    }, [phasagePhase]);
 
     // Déterminer l'image actuelle
     const imageSrc = useMemo(() => {
@@ -23,17 +37,19 @@ export function DownloadJPG() {
         const frameStr = String(currentFrame || 0).padStart(4, "0");
 
         if (mode === "planning") {
-            const folderId = String((planningPhase?.id || 1) - 1).padStart(2, "0");
-            return `${baseUrl}phases/Phase_${folderId}/Phasage${frameStr}.webp`;
+            const folder = planning360?.folder ?? `Phase_${String((planningPhase?.id || 1) - 1).padStart(2, "0")}`;
+            const prefix = planning360?.prefix ?? "Phasage";
+            return `${baseUrl}phases/${folder}/${prefix}${frameStr}.webp`;
         } else if (mode === "phasage") {
-            const folderId = String((phasagePhase?.id || 1) - 1).padStart(2, "0");
-            return `${baseUrl}phases/Phase_${folderId}/Phasage${frameStr}.webp`;
+            const folder = phasage360?.folder ?? `Phase_${String((phasagePhase?.id || 1) - 1).padStart(2, "0")}`;
+            const prefix = phasage360?.prefix ?? "Phasage";
+            return `${baseUrl}phases/${folder}/${prefix}${frameStr}.webp`;
         } else if (mode === "installation") {
             const installImage = installationViews[installationIndex]?.image;
             return installImage ? `${baseUrl}${installImage}` : "";
         }
         return "";
-    }, [mode, planningPhase, phasagePhase, installationIndex, currentFrame]);
+    }, [mode, planningPhase, phasagePhase, installationIndex, currentFrame, planning360, phasage360]);
 
     const downloadImage = async () => {
         try {

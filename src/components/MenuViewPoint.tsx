@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from "lucide-react"
 import { Viewpoint } from "./custom-svg/Viewpoint"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { useInstallationNav } from "@/hooks/useNavigationNav"
+import { useStepper } from "@/contexts/StepperContext"
 import { installationViews } from "@/data/phases"
 
 interface ViewpointButtonProps {
@@ -12,10 +13,6 @@ interface ViewpointButtonProps {
     isExpanded?: boolean
     showChevron?: boolean
 }
-
-const VIEWPOINTS_DEFAULT = [
-    "Vue Boulevard Pierre Gaudin"
-]
 
 function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }: ViewpointButtonProps) {
     return (
@@ -39,12 +36,17 @@ function ViewpointButton({ label, onClick, isSelected, isExpanded, showChevron }
 export function MenuViewPoint() {
     const { mode } = useNavigationMode()
     const { installationIndex, goTo: goToInstallation } = useInstallationNav()
+    const { currentPhase, currentPointId } = useStepper()
 
     const isInstallation = mode === "installation"
     const installationLabels = installationViews.map(v => v.label)
-    const viewpoints = isInstallation ? installationLabels : VIEWPOINTS_DEFAULT
+    const viewpoints = installationLabels
 
-    const [selectedViewpointDefault, setSelectedViewpointDefault] = useState(VIEWPOINTS_DEFAULT[0])
+    // Récupère le name du point courant en mode planning
+    const currentPoint = currentPhase?.points.find(p => p.id === currentPointId)
+    const currentPointName = currentPoint?.name ?? currentPoint?.label ?? ""
+
+    const [selectedViewpointDefault, setSelectedViewpointDefault] = useState(installationLabels[0])
     const [isExpanded, setIsExpanded] = useState(false)
     const [trackedMode, setTrackedMode] = useState(mode)
     const [trackedInstallationIndex, setTrackedInstallationIndex] = useState(installationIndex)
@@ -112,31 +114,44 @@ export function MenuViewPoint() {
 
     return (
         <div className="flex" ref={containerRef}>
-            <div
-                className={`flex relative flex-col w-fit self-start z-100 ${expandedClasses}`}
-                style={isExpanded ? { height: expandedHeight } : undefined}
-            >
-                {[
-                    selectedViewpoint,
-                    ...viewpoints.filter(v => v !== selectedViewpoint)
-                ].map((label) => {
-                    const isSelected = label === selectedViewpoint
-                    const shouldShow = isSelected || isExpanded
+            {isInstallation && (
+                <div
+                    className={`flex relative flex-col w-fit self-start z-100 ${expandedClasses}`}
+                    style={isExpanded ? { height: expandedHeight } : undefined}
+                >
+                    {[
+                        selectedViewpoint,
+                        ...viewpoints.filter(v => v !== selectedViewpoint)
+                    ].map((label) => {
+                        const isSelected = label === selectedViewpoint
+                        const shouldShow = isSelected || isExpanded
 
-                    if (!shouldShow) return null
+                        if (!shouldShow) return null
 
-                    return (
-                        <ViewpointButton
-                            key={label}
-                            label={label}
-                            isSelected={isSelected}
-                            isExpanded={isExpanded}
-                            showChevron={showChevron}
-                            onClick={() => handleViewpointClick(label)}
-                        />
-                    )
-                })}
-            </div>
+                        return (
+                            <ViewpointButton
+                                key={label}
+                                label={label}
+                                isSelected={isSelected}
+                                isExpanded={isExpanded}
+                                showChevron={showChevron}
+                                onClick={() => handleViewpointClick(label)}
+                            /> 
+                        )
+                    })}
+                </div>
+            )}
+
+            {!isInstallation && currentPointName && (
+                <div
+                    className={`flex relative flex-col w-fit self-start z-100 ${expandedClasses}`}
+                >
+                    <div className={`text-black inline-flex items-center shrink-0 z-100 h-7 lg:h-10 justify-start gap-1 lg:gap-3 border border-black px-1.5 lg:px-4 text-[10px] lg:text-sm font-medium ring-offset-background transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none -mt-[1px] lg:first:mt-0 bg-white text-black`}>
+                        <Viewpoint className="w-4 h-4 lg:w-6 lg:h-6 shrink-0" />
+                        <span className="flex-1 text-left whitespace-nowrap">{currentPointName}</span>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

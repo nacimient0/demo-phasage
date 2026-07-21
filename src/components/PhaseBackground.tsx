@@ -1,29 +1,46 @@
 import { useStepper } from "@/contexts/StepperContext"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { usePhasageNav, useInstallationNav } from "@/hooks/useNavigationNav"
-import { installationViews, frameCount } from "@/data/phases"
+import { installationViews, frameCount as defaultFrameCount, phases } from "@/data/phases"
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { Player360 } from "./Player360"
 
 export function PhaseBackground() {
-    const { currentPhase: planningPhase } = useStepper()
+    const { currentPhase: planningPhase, currentPointId } = useStepper()
     const { mode } = useNavigationMode()
     const { currentPhase: phasagePhase } = usePhasageNav()
     const { installationIndex } = useInstallationNav()
 
+    // Récupère le champ "360" du point courant en mode planning
+    const planning360 = useMemo(() => {
+        if (!planningPhase) return null
+        const point = planningPhase.points.find((p) => p.id === currentPointId)
+        return point?.["360"] ?? null
+    }, [planningPhase, currentPointId])
+
+    // Récupère le champ "360" du premier point de la phase courante en mode phasage
+    const phasage360 = useMemo(() => {
+        if (!phasagePhase) return null
+        // On utilise le premier point de la phase comme référence pour le 360
+        const point = phasagePhase.points[0]
+        return point?.["360"] ?? null
+    }, [phasagePhase])
+
     const imageSrc = useMemo(() => {
         const baseUrl = import.meta.env.BASE_URL
         if (mode === "planning") {
-            const folderId = String((planningPhase?.id || 1) - 1).padStart(2, "0")
-            return `${baseUrl}phases/Phase_${folderId}/Phasage0000.webp`
+            const folder = planning360?.folder ?? `Phase_${String((planningPhase?.id || 1) - 1).padStart(2, "00")}`
+            const prefix = planning360?.prefix ?? "Phasage"
+            return `${baseUrl}phases/${folder}/${prefix}0000.webp`
         } else if (mode === "phasage") {
-            const folderId = String((phasagePhase?.id || 1) - 1).padStart(2, "0")
-            return `${baseUrl}phases/Phase_${folderId}/Phasage0000.webp`
+            const folder = phasage360?.folder ?? `Phase_${String((phasagePhase?.id || 1) - 1).padStart(2, "00")}`
+            const prefix = phasage360?.prefix ?? "Phasage"
+            return `${baseUrl}phases/${folder}/${prefix}0000.webp`
         } else {
             return `${baseUrl}${installationViews[installationIndex].image}`
         }
-    }, [mode, planningPhase, phasagePhase, installationIndex])
+    }, [mode, planningPhase, phasagePhase, installationIndex, planning360, phasage360])
 
     const altText = mode === "installation"
         ? `Installation ${installationIndex + 1}`
@@ -32,13 +49,15 @@ export function PhaseBackground() {
             : planningPhase?.name ?? ""
 
     if (mode === "phasage" && phasagePhase) {
-        const folderId = String((phasagePhase?.id || 1) - 1).padStart(2, "0")
+        const folder = phasage360?.folder ?? `Phase_${String((phasagePhase.id || 1) - 1).padStart(2, "0")}`
+        const prefix = phasage360?.prefix ?? "Phasage"
+        const fc = phasage360?.frameCount ?? defaultFrameCount
         return (
             <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
                 <Player360
-                    folder={`Phase_${folderId}`}
-                    prefix="Phasage"
-                    frameCount={frameCount}
+                    folder={folder}
+                    prefix={prefix}
+                    frameCount={fc}
                 />
             </div>
         )
@@ -64,19 +83,18 @@ export function PhaseBackground() {
     }
 
     if (mode === "planning" && planningPhase) {
-        const folderId = String((planningPhase?.id || 1) - 1).padStart(2, "0")
+        const folder = planning360?.folder ?? `Phase_${String((planningPhase.id || 1) - 1).padStart(2, "0")}`
+        const prefix = planning360?.prefix ?? "Phasage"
+        const fc = planning360?.frameCount ?? defaultFrameCount
         return (
             <div className="fixed inset-0 w-full select-none" style={{ height: "100dvh" }}>
                 <Player360
-                    folder={`Phase_${folderId}`}
-                    prefix="Phasage"
-                    frameCount={frameCount}
+                    folder={folder}
+                    prefix={prefix}
+                    frameCount={fc}
                 />
             </div>
         )
     }
 
 }
-
-
-

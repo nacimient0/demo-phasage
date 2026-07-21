@@ -20,6 +20,52 @@ function InstallationGallery() {
         }
     }, [installationIndex])
 
+    // Seuil au-delà duquel le Swiper est nécessaire (= max slidesPerView des breakpoints)
+    const MAX_VISIBLE = 9
+    const needsSwiper = installationViews.length > MAX_VISIBLE
+
+    const thumbnailButton = (view: (typeof installationViews)[0], index: number) => {
+        const isActive = index === installationIndex
+        return (
+            <button
+                key={view.id}
+                onClick={() => {
+                    goTo(index)
+                    swiperRef.current?.slideTo(index)
+                }}
+                className={cn(
+                    "relative flex size-10 lg:size-16 overflow-hidden cursor-pointer focus:outline-none transition-all duration-300 shrink-0",
+                    isActive
+                        ? "border-2 border-[#E30613] scale-110 z-10"
+                        : "border border-white/40 opacity-70 hover:opacity-100 hover:scale-105"
+                )}
+                title={view.label}
+            >
+                <img
+                    src={`${import.meta.env.BASE_URL}${view.image}`}
+                    alt={view.label}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                />
+                <div className="absolute inset-0 hover:bg-transparent transition-colors duration-200" />
+            </button>
+        )
+    }
+
+    // Peu de photos : barre en w-fit centrée, pas de Swiper
+    if (!needsSwiper) {
+        return (
+            <div className="flex relative border rounded-full border-white w-fit px-3 lg:px-6 gap-3 lg:gap-6 bg-white/30 backdrop-blur-sm items-center h-16 lg:h-20 shadow-lg">
+                <TimelinePreviousButton />
+                <div className="flex gap-2 lg:gap-3 items-center justify-center select-none py-2">
+                    {installationViews.map((view, index) => thumbnailButton(view, index))}
+                </div>
+                <TimelineNextButton />
+            </div>
+        )
+    }
+
+    // Beaucoup de photos : Swiper scrollable pleine largeur
     return (
         <div className="flex relative border rounded-full border-white w-full max-w-4xl px-3 lg:px-6 gap-3 lg:gap-6 bg-white/30 backdrop-blur-sm items-center h-16 lg:h-20 shadow-lg">
             <TimelinePreviousButton />
@@ -51,34 +97,11 @@ function InstallationGallery() {
                     }}
                     className="w-full h-full"
                 >
-                    {installationViews.map((view, index) => {
-                        const isActive = index === installationIndex
-                        return (
-                            <SwiperSlide key={view.id} className="flex items-center justify-center h-full py-2">
-                                <button
-                                    onClick={() => {
-                                        goTo(index)
-                                        swiperRef.current?.slideTo(index)
-                                    }}
-                                    className={cn(
-                                        "relative flex size-10 lg:size-16 overflow-hidden cursor-pointer focus:outline-none transition-all duration-300",
-                                        isActive
-                                            ? "border-2 border-[#E30613] scale-110 z-10"
-                                            : "border border-white/40 opacity-70 hover:opacity-100 hover:scale-105"
-                                    )}
-                                    title={view.label}
-                                >
-                                    <img
-                                        src={`${import.meta.env.BASE_URL}${view.image}`}
-                                        alt={view.label}
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 hover:bg-transparent transition-colors duration-200" />
-                                </button>
-                            </SwiperSlide>
-                        )
-                    })}
+                    {installationViews.map((view, index) => (
+                        <SwiperSlide key={view.id} className="flex items-center justify-center h-full py-2">
+                            {thumbnailButton(view, index)}
+                        </SwiperSlide>
+                    ))}
                 </Swiper>
             </div>
             <TimelineNextButton />

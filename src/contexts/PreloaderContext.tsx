@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { phases, installationViews, frameCount } from "@/data/phases"
+import { phases, installationViews, frameCount as defaultFrameCount } from "@/data/phases"
 
 interface PreloaderContextType {
     isLoaded: boolean
@@ -20,12 +20,43 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const baseUrl = import.meta.env.BASE_URL
 
-        // 1. Chargement prioritaire de la Phase 00 (pour débloquer l'UI le plus vite possible)
+        // Collecte tous les sets d'images 360° uniques définis dans les points du JSON
+        const collect360Sets = () => {
+            const sets = new Map<string, { folder: string; prefix: string; frameCount: number }>()
+
+            for (const phase of phases) {
+                for (const point of phase.points) {
+                    const view360 = point["360"]
+                    if (view360) {
+                        const resolvedPrefix = view360.prefix ?? "Phasage"
+                        const key = `${view360.folder}_${resolvedPrefix}`
+                        if (!sets.has(key)) {
+                            sets.set(key, {
+                                folder: view360.folder,
+                                prefix: resolvedPrefix,
+                                frameCount: view360.frameCount ?? defaultFrameCount,
+                            })
+                        }
+                    }
+                }
+            }
+
+            return Array.from(sets.values())
+        }
+
+        const all360Sets = collect360Sets()
+
+        // Fallback si aucun set n'est défini dans le JSON : utilise Phase_00/Phasage
+        const prioritySet = all360Sets[0] ?? {
+            folder: "Phase_00",
+            prefix: "Phasage",
+            frameCount: defaultFrameCount,
+        }
+
+        // 1. Chargement prioritaire du premier set 360 (pour débloquer l'UI le plus vite possible)
         const loadPriority = () => {
+            const { folder, prefix, frameCount } = prioritySet
             let loadedCount = 0
-            const totalPriority = frameCount
-            const folder = "Phase_00"
-            const prefix = "Phasage"
             const phaseImages: HTMLImageElement[] = []
 
             for (let i = 0; i < frameCount; i++) {
@@ -35,9 +66,9 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
 
                 const handleLoad = () => {
                     loadedCount++
-                    setAppProgress(Math.round((loadedCount / totalPriority) * 100))
+                    setAppProgress(Math.round((loadedCount / frameCount) * 100))
 
-                    if (loadedCount === totalPriority) {
+                    if (loadedCount === frameCount) {
                         setImagesCache(prev => ({ ...prev, [`${folder}_${prefix}`]: phaseImages }))
                         setPhaseProgress(prev => ({ ...prev, [folder]: { loaded: frameCount, total: frameCount, isComplete: true } }))
 
@@ -58,19 +89,17 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
 
         // 2. Chargement en arrière-plan du reste des assets
         const loadBackground = () => {
-            // Images d'installation en PREMIER (priorité après Phase_00)
+            // Images d'installation en PREMIER (priorité après le set prioritaire)
             installationViews.forEach(view => {
                 const img1 = new Image(); img1.src = `${baseUrl}${view.image}`
                 const img2 = new Image(); img2.src = `${baseUrl}${view.minimap}`
             })
 
-            // Puis toutes les autres phases
-            phases.slice(1).forEach((phase, index) => {
-                const actualIndex = index + 1
-                const folder = `Phase_${String(actualIndex).padStart(2, "0")}`
-                const prefix = "Phasage"
-                const phaseImages: HTMLImageElement[] = []
+            // Puis tous les autres sets 360° (en sautant le premier déjà chargé)
+            const remainingSets = all360Sets.slice(1)
 
+            remainingSets.forEach(({ folder, prefix, frameCount }) => {
+                const phaseImages: HTMLImageElement[] = []
                 let loadedCount = 0
                 setPhaseProgress(prev => ({ ...prev, [folder]: { loaded: 0, total: frameCount, isComplete: false } }))
 
@@ -106,7 +135,7 @@ export function PreloaderProvider({ children }: { children: ReactNode }) {
     }
 
     const getPhaseStatus = (folder: string) => {
-        return phaseProgress[folder] || { loaded: 0, total: frameCount, isComplete: false }
+        return phaseProgress[folder] || { loaded: 0, total: defaultFrameCount, isComplete: false }
     }
 
     return (

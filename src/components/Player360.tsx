@@ -29,6 +29,8 @@ export function Player360({ folder, prefix, frameCount = defaultFrameCount, clas
     const [panStartY, setPanStartY] = useState(0)
 
     const startX = useRef(0)
+    const dragAccumulator = useRef(0)
+    const PIXELS_PER_FRAME = 8 // Réduis ce chiffre pour plus de sensibilité
 
     // Fonction pour empêcher l'image de sortir de l'écran lors du pan
     const clampPan = (px: number, py: number, zoom: number) => {
@@ -70,6 +72,7 @@ export function Player360({ folder, prefix, frameCount = defaultFrameCount, clas
     const handleStart = (clientX: number, clientY: number) => {
         setIsDragging(true)
         startX.current = clientX
+        dragAccumulator.current = 0
         // On sauvegarde la position de départ pour calculer le pan en temps réel
         setPanStartX(clientX - panX)
         setPanStartY(clientY - panY)
@@ -86,12 +89,15 @@ export function Player360({ folder, prefix, frameCount = defaultFrameCount, clas
         } else {
             // ---> MODE 360 : on change les frames <---
             const dx = clientX - startX.current
-            const w = window.innerWidth
-            const diff = Math.round((dx / w) * frameCount * 1.5) // Sensibilité
-
-            const newFrame = ((currentFrame - diff) % frameCount + frameCount) % frameCount
-            setCurrentFrame(newFrame)
             startX.current = clientX
+            dragAccumulator.current += dx
+
+            const framesToMove = Math.trunc(dragAccumulator.current / PIXELS_PER_FRAME)
+            if (framesToMove !== 0) {
+                dragAccumulator.current -= framesToMove * PIXELS_PER_FRAME
+                const newFrame = ((currentFrame - framesToMove) % frameCount + frameCount) % frameCount
+                setCurrentFrame(newFrame)
+            }
         }
     }
 

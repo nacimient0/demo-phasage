@@ -3,7 +3,8 @@ import { Play } from "@/components/animate-ui/icons/play"
 import { useNavigationMode } from "@/contexts/NavigationModeContext"
 import { useInstallationNav, usePhasageNav } from "@/hooks/useNavigationNav"
 import { useStepper } from "@/contexts/StepperContext"
-import { installationViews, frameCount } from "@/data/phases"
+import { installationViews, frameCount, phases } from "@/data/phases"
+import type { PhasePoint } from "@/types/phase"
 
 function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: string, left: string, active: boolean }) {
     return (
@@ -30,41 +31,74 @@ function VisionCone({ rotate, bottom, left, active }: { rotate: string, bottom: 
     )
 }
 
+/** Trouve le PhasePoint correspondant à un pointId donné */
+function findPoint(pointId: number): PhasePoint | undefined {
+    for (const phase of phases) {
+        const p = phase.points.find(pt => pt.id === pointId)
+        if (p) return p
+    }
+    return undefined
+}
+
 export function MassPlan() {
     const [display, setDisplay] = useState(true);
     const { mode, currentFrame } = useNavigationMode()
-    const { installationIndex, goTo: goToInstallation } = useInstallationNav()
-    const { currentPhase: phasagePhase } = usePhasageNav()
-    const { currentPhase: planningPhase } = useStepper()
+    const { installationIndex } = useInstallationNav()
+    const { currentPhase: phasagePhase, phaseIndex } = usePhasageNav()
+    const { currentPointId } = useStepper()
     const [imageError, setImageError] = useState(false)
-
     const [isZoomed, setIsZoomed] = useState(false);
 
     const isInstallation = mode === "installation"
+    const isPhasage = mode === "phasage"
 
-    let phaseId = 0;
-    if (mode === "phasage" && phasagePhase) {
-        phaseId = phasagePhase.id - 1;
-    } else if (mode === "planning" && planningPhase) {
-        phaseId = planningPhase.id - 1;
+    // Point courant selon le mode :
+    // - planning  → point identifié par currentPointId (stepper)
+    // - phasage   → premier point de la tranche sélectionnée
+    // - installation → pas de point phasage
+    let activePoint: PhasePoint | undefined
+    if (isPhasage && phasagePhase) {
+        activePoint = phasagePhase.points[0]
+    } else if (!isInstallation) {
+        activePoint = findPoint(currentPointId)
     }
 
+    // Minimap : installation → minimap de la vue ; phasage/planning → minimap du point
     const minimapSrc = isInstallation
         ? `${import.meta.env.BASE_URL}${installationViews[installationIndex].minimap}`
-        : `${import.meta.env.BASE_URL}minimaps/phase0${phaseId}.webp`
+        : activePoint?.minimap
+            ? `${import.meta.env.BASE_URL}${activePoint.minimap}`
+            : undefined
+
+    // Centre d'orbite configurable en % (défaut : centre de l'image)
+    const orbitCenter = activePoint?.orbitCenter ?? { x: 50, y: 50 }
 
     useEffect(() => {
         setImageError(false)
     }, [minimapSrc])
 
-    // Reset de l'état zoomé lors d'un changement de navigation ou phase
+    // Reset du zoom lors d'un changement de navigation ou de point
     useEffect(() => {
         setIsZoomed(false)
-    }, [mode, phaseId, installationIndex])
+    }, [mode, phaseIndex, currentPointId, installationIndex])
 
     const containerRef = useRef<HTMLDivElement>(null)
+    const imgRef = useRef<HTMLImageElement>(null)
 
-    // Fermer le zoom au clic à l'extérieur
+    // Dimensions réelles de l'image affichée → rayon en pixels = cercle parfait
+    const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
+    useEffect(() => {
+        const el = imgRef.current
+        if (!el) return
+        const ro = new ResizeObserver(() => {
+            setImgSize({ w: el.offsetWidth, h: el.offsetHeight })
+        })
+        ro.observe(el)
+        setImgSize({ w: el.offsetWidth, h: el.offsetHeight })
+        return () => ro.disconnect()
+    }, [display, minimapSrc])
+
+    // Fermer le zoom au clic extérieur
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (isZoomed && containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -75,21 +109,23 @@ export function MassPlan() {
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [isZoomed])
 
-    // Calcul de la rotation en fonction de la frame (max frameCount frames = 360 deg)
-    const rotationRatio = -(currentFrame / frameCount) * 360;
-    const baseRotation = 270;
-    const dynamicRotation = baseRotation + rotationRatio;
+    // Rotation selon la frame courante
+    const rotationRatio = -(currentFrame / frameCount) * 360
+    const baseRotation = 270
+    const dynamicRotation = baseRotation + rotationRatio
+    const angleRad = (dynamicRotation - 180) * (Math.PI / 180)
 
-    const scaleX = 40; // Rayon horizontal de l'orbite en %
-    const scaleY = 40; // Rayon vertical de l'orbite en %
-    const centerX = 50; // Position X du centre de l'orbite en %
-    const centerY = 50; // Position Y du centre de l'orbite en %
+    // Rayon : orbitRadius % de la plus petite dimension (défaut 20%) → cercle parfait
+    const orbitRadiusPct = (activePoint?.orbitRadius ?? 20) / 100
+    const orbitRadiusPx = imgSize.w > 0 && imgSize.h > 0
+        ? Math.min(imgSize.w, imgSize.h) * orbitRadiusPct
+        : 0
 
-    const angleRad = (dynamicRotation - 180) * (Math.PI / 180);
+    const centerPxX = imgSize.w * (orbitCenter.x / 100)
+    const centerPxY = imgSize.h * (orbitCenter.y / 100)
+    const orbitPxX = centerPxX + orbitRadiusPx * Math.cos(angleRad)
+    const orbitPxY = centerPxY + orbitRadiusPx * Math.sin(angleRad)
 
-    // Calcul de la position
-    const orbitLeft = centerX + (scaleX * Math.cos(angleRad));
-    const orbitTop = centerY + (scaleY * Math.sin(angleRad));
     return (
         <div ref={containerRef} className="relative w-fit select-none">
             <div
@@ -102,7 +138,7 @@ export function MassPlan() {
                 }
             </div>
 
-            {display && (
+            {display && minimapSrc && (
                 <div
                     onClick={() => setIsZoomed(!isZoomed)}
                     className={`flex relative overflow-hidden border border-white shadow-2xl bg-black/10 transition-transform duration-300 origin-top-right ${isZoomed
@@ -111,9 +147,10 @@ export function MassPlan() {
                         }`}
                 >
                     <img
-                        src={imageError ? `${import.meta.env.BASE_URL}minimaps/phase00.webp` : minimapSrc}
+                        ref={imgRef}
+                        src={imageError ? undefined : minimapSrc}
                         onError={() => setImageError(true)}
-                        alt="Mass Plan"
+                        alt="Plan de masse"
                         className="w-full h-auto shadow-lg object-cover pointer-events-none"
                     />
 
@@ -123,42 +160,42 @@ export function MassPlan() {
                                 const activeView = installationViews[installationIndex]
                                 if (!activeView || !activeView.conePosition) return null
                                 return (
-                                    <>
-                                        <VisionCone
-                                            bottom={activeView.conePosition.bottom || ""}
-                                            left={activeView.conePosition.left || ""}
-                                            rotate={activeView.conePosition.rotate || ""}
-                                            active={true}
-                                        />
-                                    </>
+                                    <VisionCone
+                                        bottom={activeView.conePosition.bottom || ""}
+                                        left={activeView.conePosition.left || ""}
+                                        rotate={activeView.conePosition.rotate || ""}
+                                        active={true}
+                                    />
                                 )
                             })()}
                         </>
                     ) : (
-                        <div
-                            className="absolute pointer-events-none"
-                            style={{
-                                top: `${orbitTop}%`,
-                                left: `${orbitLeft}%`,
-                                transform: `translate(-50%, -50%) rotate(${dynamicRotation}deg)`
-                            }}
-                        >
-                            <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
-                                <defs>
-                                    <radialGradient id="eye-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(7.25512,0,0,11.0104,7.90496,11.9798)">
-                                        <stop offset="0" style={{ stopColor: "red", stopOpacity: 1 }} />
-                                        <stop offset="0.5" style={{ stopColor: "red", stopOpacity: 1 }} />
-                                        <stop offset="1" style={{ stopColor: "red", stopOpacity: 0 }} />
-                                    </radialGradient>
-                                </defs>
-                                <g transform="matrix(1.29721,0,0,1.29721,-6.72275,-3.56655)">
-                                    <g transform="matrix(1.54147,0,0,1.54147,-3.79129,-6.46645)">
-                                        <path d="M7.905,12.002C7.905,12.002 12.939,6.394 13.017,6.48L13.022,6.475L13.022,6.486C14.394,7.984 15.16,9.945 15.16,11.985C15.16,14.026 14.394,15.987 13.022,17.485L7.905,12.002Z" style={{ fill: "url(#eye-gradient)" }} />
+                        imgSize.w > 0 && (
+                            <div
+                                className="absolute pointer-events-none"
+                                style={{
+                                    top: `${orbitPxY}px`,
+                                    left: `${orbitPxX}px`,
+                                    transform: `translate(-50%, -50%) rotate(${dynamicRotation}deg)`
+                                }}
+                            >
+                                <svg viewBox="0 0 24 24" version="1.1" style={{ fillRule: "evenodd", clipRule: "evenodd", strokeLinejoin: "round", strokeMiterlimit: 2, width: "6vw", height: "6vw", minWidth: 20, minHeight: 20, maxWidth: 45, maxHeight: 45 }}>
+                                    <defs>
+                                        <radialGradient id="eye-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(7.25512,0,0,11.0104,7.90496,11.9798)">
+                                            <stop offset="0" style={{ stopColor: "red", stopOpacity: 1 }} />
+                                            <stop offset="0.5" style={{ stopColor: "red", stopOpacity: 1 }} />
+                                            <stop offset="1" style={{ stopColor: "red", stopOpacity: 0 }} />
+                                        </radialGradient>
+                                    </defs>
+                                    <g transform="matrix(1.29721,0,0,1.29721,-6.72275,-3.56655)">
+                                        <g transform="matrix(1.54147,0,0,1.54147,-3.79129,-6.46645)">
+                                            <path d="M7.905,12.002C7.905,12.002 12.939,6.394 13.017,6.48L13.022,6.475L13.022,6.486C14.394,7.984 15.16,9.945 15.16,11.985C15.16,14.026 14.394,15.987 13.022,17.485L7.905,12.002Z" style={{ fill: "url(#eye-gradient)" }} />
+                                        </g>
+                                        <path d="M9.226,12.626L16.431,19.831C16.542,19.942 16.605,20.093 16.605,20.25C16.605,20.407 16.542,20.558 16.431,20.669L16.419,20.681C16.308,20.792 16.157,20.855 16,20.855C15.843,20.855 15.692,20.792 15.581,20.681L7.319,12.419C7.208,12.308 7.145,12.157 7.145,12C7.145,11.843 7.208,11.692 7.319,11.581L15.581,3.319C15.692,3.208 15.843,3.145 16,3.145C16.157,3.145 16.308,3.208 16.419,3.319L16.431,3.331C16.542,3.442 16.605,3.593 16.605,3.75C16.605,3.907 16.542,4.058 16.431,4.169L9.176,11.424L20.144,11.424L18.574,9.854C18.462,9.743 18.4,9.592 18.4,9.435C18.4,9.278 18.462,9.127 18.574,9.016L18.586,9.004C18.697,8.893 18.847,8.83 19.005,8.83C19.162,8.83 19.312,8.893 19.424,9.004L22.047,11.627C22.278,11.859 22.278,12.234 22.047,12.465L19.439,15.073C19.328,15.184 19.177,15.247 19.02,15.247C18.863,15.247 18.712,15.184 18.601,15.073L18.589,15.061C18.358,14.83 18.358,14.454 18.589,14.223L20.186,12.626L9.226,12.626Z" style={{ fill: "red", stroke: "black", strokeWidth: "0.24px" }} />
                                     </g>
-                                    <path d="M9.226,12.626L16.431,19.831C16.542,19.942 16.605,20.093 16.605,20.25C16.605,20.407 16.542,20.558 16.431,20.669L16.419,20.681C16.308,20.792 16.157,20.855 16,20.855C15.843,20.855 15.692,20.792 15.581,20.681L7.319,12.419C7.208,12.308 7.145,12.157 7.145,12C7.145,11.843 7.208,11.692 7.319,11.581L15.581,3.319C15.692,3.208 15.843,3.145 16,3.145C16.157,3.145 16.308,3.208 16.419,3.319L16.431,3.331C16.542,3.442 16.605,3.593 16.605,3.75C16.605,3.907 16.542,4.058 16.431,4.169L9.176,11.424L20.144,11.424L18.574,9.854C18.462,9.743 18.4,9.592 18.4,9.435C18.4,9.278 18.462,9.127 18.574,9.016L18.586,9.004C18.697,8.893 18.847,8.83 19.005,8.83C19.162,8.83 19.312,8.893 19.424,9.004L22.047,11.627C22.278,11.859 22.278,12.234 22.047,12.465L19.439,15.073C19.328,15.184 19.177,15.247 19.02,15.247C18.863,15.247 18.712,15.184 18.601,15.073L18.589,15.061C18.358,14.83 18.358,14.454 18.589,14.223L20.186,12.626L9.226,12.626Z" style={{ fill: "red", stroke: "black", strokeWidth: "0.24px" }} />
-                                </g>
-                            </svg>
-                        </div>
+                                </svg>
+                            </div>
+                        )
                     )}
                 </div>
             )}
